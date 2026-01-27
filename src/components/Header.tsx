@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Sparkles, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlitchText } from '@/components/effects/CyberComponents'
+import AuthButton from '@/components/auth/AuthButton'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -92,13 +93,13 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Actions - Removed theme toggle */}
-          <div className="flex items-center gap-1 md:gap-2">
+          {/* Actions - Auth Button + Subscribe */}
+          <div className="flex items-center gap-2 md:gap-3">
+            <AuthButton />
+            
             <motion.button
-              className="hidden sm:flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-5 md:py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg md:rounded-xl text-sm font-medium shadow-lg"
-              whileHover={{
-                scale: 1.02,
-              }}
+              className="hidden sm:flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg md:rounded-xl text-sm font-medium shadow-lg"
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -153,7 +154,7 @@ export default function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <nav className="flex flex-col gap-1">
+                <nav className="flex flex-col gap-2">
                   {navItems.map((item, index) => (
                     <motion.a
                       key={item}
@@ -167,16 +168,18 @@ export default function Header() {
                       {item}
                     </motion.a>
                   ))}
-                  <motion.button
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 mt-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Zap className="w-4 h-4" />
-                    Subscribe
-                  </motion.button>
+                  <div className="border-t border-slate-700/50 my-2 pt-2">
+                    <motion.button
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Zap className="w-4 h-4" />
+                      Subscribe
+                    </motion.button>
+                  </div>
                 </nav>
               </motion.div>
             </motion.div>
