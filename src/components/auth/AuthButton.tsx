@@ -5,11 +5,9 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Github, 
-  Google, 
   LogOut, 
   User, 
   ChevronDown,
-  Settings,
   Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
