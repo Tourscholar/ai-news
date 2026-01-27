@@ -26,77 +26,17 @@ interface GitHubRepo {
 
 async function fetchGitHubTrending(): Promise<GitHubRepo[]> {
   try {
-    // Fetch from GitHub Trending page directly
-    const res = await fetch('https://github.com/trending?since=weekly&spoken_language_code=en', {
-      next: { revalidate: 3600 },
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml'
-      }
+    // Call our API endpoint which handles CORS
+    const res = await fetch('/api/github', {
+      next: { revalidate: 3600 }
     })
     
     if (!res.ok) throw new Error('Failed to fetch')
     
-    const html = await res.text()
+    const data = await res.json()
     
-    // Parse the trending page
-    const repoItems: GitHubRepo[] = []
-    
-    // Match each repo article
-    const articleRegex = /<article class="Box-item">([\s\S]*?)<\/article>/g
-    let articleMatch
-    let count = 0
-    
-    while ((articleMatch = articleRegex.exec(html)) !== null && count < 12) {
-      const article = articleMatch[1]
-      
-      // Extract author and repo name
-      const repoLinkMatch = article.match(/<a href="\/([^"]+)\/([^"]+)">/)
-      const author = repoLinkMatch?.[1] || 'unknown'
-      const repoName = repoLinkMatch?.[2] || 'unknown'
-      
-      // Extract description
-      const descMatch = article.match(/<p[^>]*class="[^"]*color-fg-muted[^"]*"[^>]*>([^<]+)<\/p>/)
-      const description = descMatch?.[1]?.trim() || ''
-      
-      // Extract star count
-      const starMatch = article.match(/<svg[^>]*aria-label="star"[^>]*><\/svg>\s*([\d,]+)/)
-      const stars = parseInt(starMatch?.[1]?.replace(/,/g, '') || '0')
-      
-      // Extract star count this week
-      const starThisWeekMatch = article.match(/\(([\d,]+)\s*stars?\s*today\)/i) || article.match(/([\d,]+)\s*stars?\s*this\s*week/i)
-      const starsThisWeek = starThisWeekMatch ? parseInt(starThisWeekMatch[1]?.replace(/,/g, '') || '0') : Math.floor(stars / 7)
-      
-      // Extract fork count
-      const forkMatch = article.match(/<svg[^>]*aria-label="fork"[^>]*><\/svg>\s*([\d,]+)/)
-      const forks = parseInt(forkMatch?.[1]?.replace(/,/g, '') || '0')
-      
-      // Extract language
-      const langMatch = article.match(/<span[^>]*class="[^"]*d-inline-flex[^"]*"[^>]*>([^<]+)<\/span>/)
-      const language = langMatch?.[1]?.trim() || ''
-      
-      // Generate avatar URL
-      const avatar = `https://avatars.githubusercontent.com/u/${Math.abs(author.charCodeAt(0) * 1000 + author.length) % 1000000}?v=4`
-      
-      repoItems.push({
-        id: count,
-        name: repoName,
-        full_name: `${author}/${repoName}`,
-        description: description || 'No description available',
-        stars,
-        forks,
-        language: language || 'Unknown',
-        author,
-        avatar,
-        url: `https://github.com/${author}/${repoName}`,
-        starsThisWeek
-      })
-      
-      count++
-    }
-    
-    if (repoItems.length > 0) {
-      return repoItems
+    if (Array.isArray(data) && data.length > 0) {
+      return data
     }
     
     throw new Error('No repos found')
