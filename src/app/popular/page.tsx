@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import { 
   TrendingUp, 
   Sparkles, 
@@ -29,7 +29,7 @@ interface PopularItem {
   image?: string
 }
 
-// Simulated popular data (in production, this would come from analytics)
+// Simulated popular data
 const generatePopularItems = (): PopularItem[] => [
   {
     id: '1',
@@ -60,7 +60,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '4',
-    title: 'Midjourney V7: Stunning New Features and Capabilities',
+    title: 'Midjourney V7: Stunning New Features',
     source: 'Wired',
     category: 'application',
     views: '1.2M',
@@ -69,7 +69,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '5',
-    title: 'Google DeepMind AlphaFold 3: Revolutionizing Drug Discovery',
+    title: 'Google DeepMind AlphaFold 3: Drug Discovery',
     source: 'MIT Tech Review',
     category: 'industry',
     views: '980K',
@@ -78,7 +78,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '6',
-    title: 'Anthropic Claude 3.5 vs GPT-4: Ultimate Comparison',
+    title: 'Claude 3.5 vs GPT-4: Ultimate Comparison',
     source: 'Ars Technica',
     category: 'application',
     views: '876K',
@@ -87,7 +87,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '7',
-    title: 'China\'s New AI Regulations: What Companies Need to Know',
+    title: 'China\'s AI Regulations: What Companies Need',
     source: 'Bloomberg',
     category: 'policy',
     views: '754K',
@@ -105,7 +105,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '9',
-    title: 'Runway Gen-3 Alpha: Text-to-Video Revolution',
+    title: 'Runway Gen-3 Alpha: Text-to-Video',
     source: 'TechCrunch',
     category: 'application',
     views: '612K',
@@ -114,7 +114,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '10',
-    title: 'Meta LLaMA 4 Leaks: Performance Benchmarks',
+    title: 'Meta LLaMA 4 Leaks: Performance',
     source: 'Wired',
     category: 'industry',
     views: '567K',
@@ -123,7 +123,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '11',
-    title: 'Tesla Optimus: New Demo Shows Humanoid Progress',
+    title: 'Tesla Optimus: Humanoid Progress',
     source: 'Reuters',
     category: 'industry',
     views: '523K',
@@ -132,7 +132,7 @@ const generatePopularItems = (): PopularItem[] => [
   },
   {
     id: '12',
-    title: 'AI in Healthcare: FDA Approvals Hit Record High',
+    title: 'AI in Healthcare: FDA Approvals',
     source: 'MIT News',
     category: 'application',
     views: '498K',
@@ -153,6 +153,7 @@ export default function PopularPage() {
   const [items] = useState<PopularItem[]>(generatePopularItems)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [columnCount, setColumnCount] = useState(1)
+  const [showBackToTop, setShowBackToTop] = useState(false)
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
   
@@ -165,25 +166,21 @@ export default function PopularPage() {
     return () => window.removeEventListener('resize', updateColumnCount)
   }, [])
   
-  const refreshData = useCallback(() => {
-    setIsRefreshing(true)
-    setTimeout(() => setIsRefreshing(false), 1500)
-  }, [])
-
-  // Masonry layout - distribute items into columns
-  const columns: PopularItem[][] = Array.from({ length: columnCount }, () => [])
-  
-  // Scroll state for back to top button
-  const [showBackToTop, setShowBackToTop] = useState(false)
-  
   useEffect(() => {
     const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 500)
+      setShowBackToTop(window.scrollY > 300)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
   
+  const refreshData = () => {
+    setIsRefreshing(true)
+    setTimeout(() => setIsRefreshing(false), 1500)
+  }
+
+  // Masonry layout
+  const columns: PopularItem[][] = Array.from({ length: columnCount }, () => [])
   items.forEach((item, index) => {
     columns[index % columnCount].push(item)
   })
@@ -203,7 +200,6 @@ export default function PopularPage() {
         <ParticleGrid />
       </div>
       
-      {/* Mobile gradient background */}
       <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 -z-10 md:hidden" />
       
       <Header />
@@ -211,7 +207,6 @@ export default function PopularPage() {
       {/* Hero Section */}
       <section className="relative py-12 md:py-16 overflow-hidden z-10">
         <div className="container mx-auto px-4 max-w-5xl">
-          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -223,7 +218,6 @@ export default function PopularPage() {
             </NeonCard>
           </motion.div>
           
-          {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -236,7 +230,6 @@ export default function PopularPage() {
             />
           </motion.h1>
           
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -246,18 +239,13 @@ export default function PopularPage() {
             {t('popularDesc')}
           </motion.p>
           
-          {/* Refresh Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="flex justify-center"
           >
-            <CyberButton
-              onClick={refreshData}
-              disabled={isRefreshing}
-              className="flex items-center gap-2"
-            >
+            <CyberButton onClick={refreshData} disabled={isRefreshing} className="flex items-center gap-2">
               <motion.div
                 animate={{ rotate: isRefreshing ? 360 : 0 }}
                 transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
@@ -288,14 +276,19 @@ export default function PopularPage() {
         </div>
       </main>
       
-      {/* Back to Top */}
+      {/* Back to Top - Fixed position button */}
       <motion.button
-        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
         initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: showBackToTop ? 1 : 0, scale: showBackToTop ? 1 : 0 }}
+        animate={{ 
+          opacity: showBackToTop ? 1 : 0,
+          scale: showBackToTop ? 1 : 0,
+          y: showBackToTop ? 0 : 20
+        }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        style={{ pointerEvents: showBackToTop ? 'auto' : 'none' }}
       >
         <ArrowUp className="w-5 h-5" />
       </motion.button>
@@ -322,19 +315,22 @@ function PopularCard({ item, index, colorClass }: { item: PopularItem; index: nu
   
   return (
     <motion.article
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+      whileHover={{ y: -4 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => window.open(item.url, '_blank')}
-      className="group cursor-pointer"
+      className="group cursor-pointer h-full"
     >
-      <NeonCard glowColor={item.category as any} className="p-5 relative overflow-hidden">
+      <NeonCard 
+        glowColor={item.category as any} 
+        className="p-5 relative overflow-hidden h-full flex flex-col"
+      >
         {/* Rank Badge */}
         <motion.div
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-sm`}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-sm shrink-0`}
           animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
           transition={{ duration: 0.5 }}
         >
@@ -342,33 +338,35 @@ function PopularCard({ item, index, colorClass }: { item: PopularItem; index: nu
         </motion.div>
         
         {/* Category Badge */}
-        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorClass} text-white mb-3`}>
+        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorClass} text-white mb-3 shrink-0`}>
           <TrendingUp className="w-3 h-3" />
           {item.category}
         </div>
         
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-10">
+        {/* Title - Fixed height */}
+        <h2 className="text-lg font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-10 h-[3.5rem] overflow-hidden">
           {item.title}
         </h2>
         
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-          <span className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            {item.source}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {item.timestamp}
-          </span>
-        </div>
-        
-        {/* Views */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-700/50">
-          <Zap className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-medium text-amber-400">{item.views}</span>
-          <span className="text-xs text-slate-500">{t('views')}</span>
+        {/* Meta - Push to bottom */}
+        <div className="mt-auto pt-3 border-t border-slate-700/50">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+            <span className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+              <span className="truncate max-w-[80px]">{item.source}</span>
+            </span>
+            <span className="flex items-center gap-1 shrink-0">
+              <Clock className="w-3 h-3" />
+              {item.timestamp}
+            </span>
+          </div>
+          
+          {/* Views */}
+          <div className="flex items-center gap-2 mt-2">
+            <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="text-sm font-medium text-amber-400">{item.views}</span>
+            <span className="text-xs text-slate-500">{t('views')}</span>
+          </div>
         </div>
         
         {/* Hover Glow Effect */}
