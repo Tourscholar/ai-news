@@ -17,7 +17,7 @@ export default function Header() {
   const navItems = [
     { key: 'navLatest', href: '/' },
     { key: 'navPopular', href: '/popular' },
-    { key: 'navAbout', href: '#' },
+    { key: 'navGithub', href: '/github' },
   ]
 
   return (
