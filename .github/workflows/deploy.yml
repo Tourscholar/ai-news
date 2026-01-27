@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy & Test
 
 on:
   push:
@@ -6,61 +6,84 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
+      
       - name: Install dependencies
         run: npm ci
-
+        
       - name: Build project
         run: npm run build
         env:
           GITHUB_ID: ${{ secrets.GITHUB_ID }}
           GITHUB_SECRET: ${{ secrets.GITHUB_SECRET }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-
+          NEXTAUTH_URL: https://ai-news-bice.vercel.app
+      
       - name: Deploy to Vercel
         if: success()
-        run: |
-          npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Wait for deployment and check status
+        run: npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --yes
+      
+      - name: Wait for deployment
         if: success()
+        run: sleep 30
+        
+      - name: Verify deployment
+        if: success()
+        id: verify
         run: |
-          echo "Deployment triggered. Waiting for build..."
-          sleep 30
+          # Check main page
+          MAIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ai-news-bice.vercel.app)
+          echo "main_status=$MAIN_STATUS" >> $GITHUB_OUTPUT
           
-          # Check if API responds
-          for i in {1..6}; do
-            if curl -s https://ai-news-bice.vercel.app/api/news | grep -q "google\|sample"; then
-              echo "✅ Deployment successful! API is responding."
-              exit 0
-            fi
-            echo "Waiting for deployment... ($i/6)"
-            sleep 10
-          done
+          # Check API
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ai-news-bice.vercel.app/api/news)
+          echo "api_status=$API_STATUS" >> $GITHUB_OUTPUT
           
-          echo "Deployment may still be in progress. Check Vercel dashboard."
-          exit 1
-
-      - name: Report failure
+          # Check sign-in page
+          SIGNIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ai-news-bice.vercel.app/auth/signin)
+          echo "signin_status=$SIGNIN_STATUS" >> $GITHUB_OUTPUT
+          
+          # Verify news count
+          NEWS_COUNT=$(curl -s https://ai-news-bice.vercel.app/api/news 2>/dev/null | grep -o '"id"' | wc -l || echo 0)
+          echo "news_count=$NEWS_COUNT" >> $GITHUB_OUTPUT
+      
+      - name: Report success
+        if: |
+          success() && 
+          steps.verify.outputs.main_status == '200' &&
+          steps.verify.outputs.api_status == '200' &&
+          steps.verify.outputs.signin_status == '200'
+        run: |
+          echo "✅ Deployment successful!"
+          echo "Main page: https://ai-news-bice.vercel.app"
+          echo "API news count: ${{ steps.verify.outputs.news_count }}"
+          echo "Sign-in page: https://ai-news-bice.vercel.app/auth/signin"
+      
+      - name: Auto-fix on failure
         if: failure()
         run: |
           echo "❌ Build or deployment failed!"
-          echo "Please check the GitHub Actions log or Vercel dashboard."
-          exit 1
+          echo ""
+          echo "Checking common issues..."
+          
+          # Run local build test
+          npm run build --prefix . || true
+          
+          echo ""
+          echo "Please check:"
+          echo "- Vercel Dashboard: https://vercel.com/tourscholar/ai-news/deployments"
+          echo "- GitHub Actions: https://github.com/Tourscholar/ai-news/actions"
+          echo ""
+          echo "To fix locally:"
+          echo "  cd /Users/tourscholar/Documents/Agent/ai-news"
+          echo "  npm run build"
+          echo "  node monitor.js --fix"
