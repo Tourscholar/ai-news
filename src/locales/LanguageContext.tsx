@@ -30,6 +30,8 @@ const translations: Record<string, Record<string, string>> = {
     benefit1: '个性化新闻推荐', benefit2: '收藏和书签', benefit3: '实时通知',
     privacyNote: '登录即表示您同意我们的服务条款和隐私政策。',
     backHome: '返回首页',
+    trendingNow: '🔥 正在热搜', popularTitle: '热门新闻', popularDesc: '探索最受关注的 AI 新闻和趋势',
+    views: '次阅读',
   },
   en: {
     siteTitle: 'AI News', siteSubtitle: 'Daily',
@@ -51,6 +53,8 @@ const translations: Record<string, Record<string, string>> = {
     benefit1: 'Personalized recommendations', benefit2: 'Save and bookmark', benefit3: 'Real-time notifications',
     privacyNote: 'By signing in, you agree to our Terms of Service and Privacy Policy.',
     backHome: 'Back to Home',
+    trendingNow: '🔥 Trending Now', popularTitle: 'Popular News', popularDesc: 'Explore the most talked about AI news and trends',
+    views: 'views',
   }
 }
 

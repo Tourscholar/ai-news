@@ -69,20 +69,23 @@ interface CyberButtonProps {
   children: React.ReactNode
   className?: string
   onClick?: () => void
+  disabled?: boolean
 }
 
-export function CyberButton({ children, className, onClick }: CyberButtonProps) {
+export function CyberButton({ children, className, onClick, disabled }: CyberButtonProps) {
   return (
     <motion.button
       className={cn(
         'relative px-6 py-3 overflow-hidden rounded-xl font-medium',
         'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600',
         'text-white shadow-lg shadow-indigo-500/25',
+        disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
+      disabled={disabled}
     >
       {/* Animated border */}
       <motion.div

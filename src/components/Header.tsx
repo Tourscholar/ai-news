@@ -15,8 +15,8 @@ export default function Header() {
   const [isHovered, setIsHovered] = useState(false)
 
   const navItems = [
-    { key: 'navLatest', href: '#' },
-    { key: 'navPopular', href: '#' },
+    { key: 'navLatest', href: '/' },
+    { key: 'navPopular', href: '/popular' },
     { key: 'navAbout', href: '#' },
   ]
 
