@@ -288,14 +288,19 @@ export default function PopularPage() {
         </div>
       </main>
       
-      {/* Back to Top */}
+      {/* Back to Top - Fixed position button */}
       <motion.button
-        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
         initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: showBackToTop ? 1 : 0, scale: showBackToTop ? 1 : 0 }}
+        animate={{ 
+          opacity: showBackToTop ? 1 : 0,
+          scale: showBackToTop ? 1 : 0,
+          y: showBackToTop ? 0 : 20
+        }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        style={{ pointerEvents: showBackToTop ? 'auto' : 'none' }}
       >
         <ArrowUp className="w-5 h-5" />
       </motion.button>
@@ -322,19 +327,22 @@ function PopularCard({ item, index, colorClass }: { item: PopularItem; index: nu
   
   return (
     <motion.article
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+      whileHover={{ y: -4 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => window.open(item.url, '_blank')}
-      className="group cursor-pointer"
+      className="group cursor-pointer h-full"
     >
-      <NeonCard glowColor={item.category as any} className="p-5 relative overflow-hidden">
+      <NeonCard 
+        glowColor={item.category as any} 
+        className="p-5 relative overflow-hidden h-full flex flex-col"
+      >
         {/* Rank Badge */}
         <motion.div
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-sm`}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-sm shrink-0`}
           animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
           transition={{ duration: 0.5 }}
         >
@@ -342,33 +350,35 @@ function PopularCard({ item, index, colorClass }: { item: PopularItem; index: nu
         </motion.div>
         
         {/* Category Badge */}
-        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorClass} text-white mb-3`}>
+        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorClass} text-white mb-3 shrink-0`}>
           <TrendingUp className="w-3 h-3" />
           {item.category}
         </div>
         
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-10">
+        {/* Title - Fixed height with truncation */}
+        <h2 className="text-lg font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-10 h-[4.5rem] overflow-hidden">
           {item.title}
         </h2>
         
-        {/* Meta */}
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-          <span className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            {item.source}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {item.timestamp}
-          </span>
-        </div>
-        
-        {/* Views */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-700/50">
-          <Zap className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-medium text-amber-400">{item.views}</span>
-          <span className="text-xs text-slate-500">{t('views')}</span>
+        {/* Meta - Push to bottom */}
+        <div className="mt-auto pt-3 border-t border-slate-700/50">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+            <span className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+              <span className="truncate max-w-[80px]">{item.source}</span>
+            </span>
+            <span className="flex items-center gap-1 shrink-0">
+              <Clock className="w-3 h-3" />
+              {item.timestamp}
+            </span>
+          </div>
+          
+          {/* Views */}
+          <div className="flex items-center gap-2 mt-2">
+            <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="text-sm font-medium text-amber-400">{item.views}</span>
+            <span className="text-xs text-slate-500">{t('views')}</span>
+          </div>
         </div>
         
         {/* Hover Glow Effect */}

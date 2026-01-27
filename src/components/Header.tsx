@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Sparkles, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -11,6 +12,7 @@ import { useLanguage } from '@/locales/LanguageContext'
 
 export default function Header() {
   const { t } = useLanguage()
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -19,6 +21,15 @@ export default function Header() {
     { key: 'navPopular', href: '/popular' },
     { key: 'navGithub', href: '/github' },
   ]
+
+  const getActiveIndex = () => {
+    if (pathname === '/') return 0
+    if (pathname === '/popular') return 1
+    if (pathname === '/github') return 2
+    return 0
+  }
+
+  const activeIndex = getActiveIndex()
 
   return (
     <motion.header
@@ -81,7 +92,7 @@ export default function Header() {
                 href={item.href}
                 className={cn(
                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300",
-                  index === 0 ? "text-white" : "text-slate-400 hover:text-white"
+                  index === activeIndex ? "text-white" : "text-slate-400 hover:text-white"
                 )}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -89,7 +100,7 @@ export default function Header() {
                 whileHover={{ scale: 1.05 }}
               >
                 <span className="relative z-10">{t(item.key)}</span>
-                {index === 0 && (
+                {index === activeIndex && (
                   <motion.div
                     className="absolute inset-0 bg-slate-800/50 rounded-lg"
                     layoutId="activeNav"
