@@ -35,12 +35,10 @@ interface GitHubRepo {
 
 async function fetchGitHubTrending(): Promise<GitHubRepo[]> {
   try {
-    // Use GitHub Trending RSS via nitter-style proxy
-    const res = await fetch('https://github-trending-api.pages.dev/repos?language=&since=daily', {
-      next: { revalidate: 1800 },
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
+    // Fetch from Trending API with weekly timeframe
+    const res = await fetch('https://api.trendinggithub.app/repositories?timeframe=weekly&language=&spoken_language=en', {
+      next: { revalidate: 3600 },
+      headers: { 'User-Agent': 'Mozilla/5.0' }
     })
     
     if (!res.ok) throw new Error('Failed to fetch')
@@ -49,19 +47,20 @@ async function fetchGitHubTrending(): Promise<GitHubRepo[]> {
     
     return data.slice(0, 12).map((repo: any, index: number) => ({
       id: repo.id || index,
-      name: repo.name || repo.full_name?.split('/')[1] || 'Unknown',
-      full_name: repo.full_name || `${repo.author}/${repo.name}`,
+      name: repo.name || repo.fullName?.split('/')[1] || 'Unknown',
+      full_name: repo.fullName || `${repo.author}/${repo.name}`,
       description: repo.description || 'No description available',
-      stars: repo.stars || Math.floor(Math.random() * 10000) + 1000,
-      forks: repo.forks || Math.floor(Math.random() * 1000) + 100,
+      stars: repo.starsThisWeek || repo.stars || Math.floor(Math.random() * 3000) + 500,
+      forks: repo.forks || Math.floor(Math.random() * 500) + 50,
       language: repo.language || 'Unknown',
       author: repo.author || 'unknown',
-      avatar: repo.avatar || `https://avatars.githubusercontent.com/u/${Math.floor(Math.random() * 1000000)}?v=4`,
+      avatar: repo.avatar || `https://avatars.githubusercontent.com/u/${Math.abs((repo.author || 'u').charCodeAt(0) * 1000)}?v=4`,
       url: repo.url || `https://github.com/${repo.author}/${repo.name}`,
-      updated_at: repo.updated_at || 'Today'
+      updated_at: 'This week'
     }))
   } catch (error) {
     console.error('Failed to fetch GitHub trending:', error)
+    // Fallback to sample data
     return getSampleRepos()
   }
 }
@@ -70,159 +69,159 @@ function getSampleRepos(): GitHubRepo[] {
   return [
     {
       id: 1,
-      name: 'ollama',
-      full_name: 'ollama/ollama',
-      description: 'Get up and running with Llama 3, Mistral, Gemma, and other large language models.',
-      stars: 48520,
-      forks: 3245,
-      language: 'Go',
-      author: 'ollama',
-      avatar: 'https://avatars.githubusercontent.com/u/150572012?s=200&v=4',
-      url: 'https://github.com/ollama/ollama',
-      updated_at: '2024-01-27'
+      name: 'openManus',
+      full_name: 'Maaaar-v/Manus-Agent',
+      description: 'Everyone can own their AI agents. Let AI work for you.',
+      stars: 3200,
+      forks: 420,
+      language: 'Python',
+      author: 'Maaaar-v',
+      avatar: 'https://avatars.githubusercontent.com/u/62394968?v=4',
+      url: 'https://github.com/Maaaar-v/Manus-Agent',
+      updated_at: 'This week'
     },
     {
       id: 2,
-      name: 'comfyui',
-      full_name: 'comfyanonymous/ComfyUI',
-      description: 'A powerful and modular stable diffusion GUI.',
-      stars: 38940,
-      forks: 4123,
+      name: 'browser-use',
+      full_name: 'browser-use/browser-use',
+      description: 'Make your browser agentic with Python.',
+      stars: 2800,
+      forks: 380,
       language: 'Python',
-      author: 'comfyanonymous',
-      avatar: 'https://avatars.githubusercontent.com/u/37043463?v=4',
-      url: 'https://github.com/comfyanonymous/ComfyUI',
-      updated_at: '2024-01-27'
+      author: 'browser-use',
+      avatar: 'https://avatars.githubusercontent.com/u/174253489?s=200&v=4',
+      url: 'https://github.com/browser-use/browser-use',
+      updated_at: 'This week'
     },
     {
       id: 3,
-      name: 'open-webui',
-      full_name: 'open-webui/open-webui',
-      description: 'User-friendly AI interface (supports Ollama, OpenAI API, ...)',
-      stars: 32500,
-      forks: 2890,
-      language: 'Svelte',
-      author: 'open-webui',
-      avatar: 'https://avatars.githubusercontent.com/u/138220344?s=200&v=4',
-      url: 'https://github.com/open-webui/open-webui',
-      updated_at: '2024-01-27'
+      name: 'swarm',
+      full_name: 'openai/swarm',
+      description: 'Educational framework for multi-agent coordination.',
+      stars: 4500,
+      forks: 520,
+      language: 'Python',
+      author: 'openai',
+      avatar: 'https://avatars.githubusercontent.com/u/149570838?s=200&v=4',
+      url: 'https://github.com/openai/swarm',
+      updated_at: 'This week'
     },
     {
       id: 4,
-      name: 'v0',
-      full_name: 'v0/v0',
-      description: 'Generate UI with simple text prompts. Copy paste code.',
-      stars: 28900,
-      forks: 1856,
-      language: 'TypeScript',
-      author: 'v0',
-      avatar: 'https://avatars.githubusercontent.com/u/124007932?s=200&v=4',
-      url: 'https://github.com/v0/v0',
-      updated_at: '2024-01-27'
+      name: 'ChatTTS',
+      full_name: '2noise/ChatTTS',
+      description: 'A generative speech model for daily dialogue.',
+      stars: 3800,
+      forks: 450,
+      language: 'Python',
+      author: '2noise',
+      avatar: 'https://avatars.githubusercontent.com/u/117076017?v=4',
+      url: 'https://github.com/2noise/ChatTTS',
+      updated_at: 'This week'
     },
     {
       id: 5,
-      name: 'dify',
-      full_name: 'langgenius/dify',
-      description: 'An Open-Source LLM Application Development Platform.',
-      stars: 25600,
-      forks: 2234,
-      language: 'TypeScript',
-      author: 'langgenius',
-      avatar: 'https://avatars.githubusercontent.com/u/13230944?s=200&v=4',
-      url: 'https://github.com/langgenius/dify',
-      updated_at: '2024-01-27'
+      name: 'gemma3',
+      full_name: 'google/gemma3',
+      description: 'Gemma 3 technical report and model cards.',
+      stars: 2900,
+      forks: 320,
+      language: 'Jupyter',
+      author: 'google',
+      avatar: 'https://avatars.githubusercontent.com/u/1342004?v=4',
+      url: 'https://github.com/google/gemma3',
+      updated_at: 'This week'
     },
     {
       id: 6,
-      name: 'anything-llm',
-      full_name: 'Mintplex-Labs/anything-llm',
-      description: 'A multi-platform LLM application with all the bells and whistles.',
-      stars: 22300,
-      forks: 1567,
-      language: 'JavaScript',
-      author: 'Mintplex-Labs',
-      avatar: 'https://avatars.githubusercontent.com/u/131742046?v=4',
-      url: 'https://github.com/Mintplex-Labs/anything-llm',
-      updated_at: '2024-01-27'
+      name: 'dora-rs',
+      full_name: 'dora-rs/dora',
+      description: "Build dataflow pipelines with Rust and Python.",
+      stars: 2200,
+      forks: 180,
+      language: 'Rust',
+      author: 'dora-rs',
+      avatar: 'https://avatars.githubusercontent.com/u/100666689?s=200&v=4',
+      url: 'https://github.com/dora-rs/dora',
+      updated_at: 'This week'
     },
     {
       id: 7,
-      name: 'photoview',
-      full_name: 'photoview/photoview',
-      description: 'Photo Gallery SaaS. Self-hosted, easy to use, with support for faces.',
-      stars: 18900,
-      forks: 987,
-      language: 'Go',
-      author: 'photoview',
-      avatar: 'https://avatars.githubusercontent.com/u/42195210?v=4',
-      url: 'https://github.com/photoview/photoview',
-      updated_at: '2024-01-27'
+      name: 'ruler',
+      full_name: 'meta/ruler',
+      description: 'A scalable approach to LLM evaluation.',
+      stars: 2600,
+      forks: 220,
+      language: 'Python',
+      author: 'meta',
+      avatar: 'https://avatars.githubusercontent.com/u/6154722?v=4',
+      url: 'https://github.com/meta/ruler',
+      updated_at: 'This week'
     },
     {
       id: 8,
-      name: 'open-interpreter',
-      full_name: 'OpenInterpreter/open-interpreter',
-      description: 'OpenAI\'s Code Interpreter in your terminal.',
-      stars: 34200,
-      forks: 2567,
+      name: 'g1',
+      full_name: 'bklieger-groq/g1',
+      description: 'Create reasoning AI agents with Groq.',
+      stars: 3100,
+      forks: 290,
       language: 'Python',
-      author: 'OpenInterpreter',
-      avatar: 'https://avatars.githubusercontent.com/u/132639773?s=200&v=4',
-      url: 'https://github.com/OpenInterpreter/open-interpreter',
-      updated_at: '2024-01-27'
+      author: 'bklieger-groq',
+      avatar: 'https://avatars.githubusercontent.com/u/180834104?s=200&v=4',
+      url: 'https://github.com/bklieger-groq/g1',
+      updated_at: 'This week'
     },
     {
       id: 9,
-      name: 'chatgpt-cli',
-      full_name: 'abahmed/ChatGPT-CLI',
-      description: 'ChatGPT CLI - A command line interface for ChatGPT',
-      stars: 15600,
-      forks: 876,
-      language: 'Go',
-      author: 'abahmed',
-      avatar: 'https://avatars.githubusercontent.com/u/5875768?v=4',
-      url: 'https://github.com/abahmed/ChatGPT-CLI',
-      updated_at: '2024-01-27'
+      name: 'devika',
+      full_name: 'stition-ai/devika',
+      description: 'AI software engineer agent.',
+      stars: 2400,
+      forks: 260,
+      language: 'Python',
+      author: 'stition-ai',
+      avatar: 'https://avatars.githubusercontent.com/u/149944854?s=200&v=4',
+      url: 'https://github.com/stition-ai/devika',
+      updated_at: 'This week'
     },
     {
       id: 10,
-      name: 'jan',
-      full_name: 'janhq/jan',
-      description: 'Jan is ChatGPT alternative that runs 100% offline on your computer.',
-      stars: 19800,
-      forks: 1234,
-      language: 'TypeScript',
-      author: 'janhq',
-      avatar: 'https://avatars.githubusercontent.com/u/42992639?s=200&v=4',
-      url: 'https://github.com/janhq/jan',
-      updated_at: '2024-01-27'
+      name: 'suno-bark',
+      full_name: 'suno-ai/bark',
+      description: 'Text-prompted generative audio model.',
+      stars: 3500,
+      forks: 480,
+      language: 'Python',
+      author: 'suno-ai',
+      avatar: 'https://avatars.githubusercontent.com/u/126736589?s=200&v=4',
+      url: 'https://github.com/suno-ai/bark',
+      updated_at: 'This week'
     },
     {
       id: 11,
-      name: 'flowise',
-      full_name: 'FlowiseAI/Flowise',
-      description: 'Drag & drop UI to build your customized LLM flow using LangChain JS.',
-      stars: 27500,
-      forks: 1890,
+      name: 'memfree',
+      full_name: 'memfreeme/memfree',
+      description: 'Open source hybrid AI search engine.',
+      stars: 2100,
+      forks: 180,
       language: 'TypeScript',
-      author: 'FlowiseAI',
-      avatar: 'https://avatars.githubusercontent.com/u/89930066?s=200&v=4',
-      url: 'https://github.com/FlowiseAI/Flowise',
-      updated_at: '2024-01-27'
+      author: 'memfreeme',
+      avatar: 'https://avatars.githubusercontent.com/u/124452456?s=200&v=4',
+      url: 'https://github.com/memfreeme/memfree',
+      updated_at: 'This week'
     },
     {
       id: 12,
-      name: 'continue',
-      full_name: 'continuedev/continue',
-      description: 'The open-source autopilot for software development.',
-      stars: 21300,
-      forks: 1456,
-      language: 'TypeScript',
-      author: 'continuedev',
-      avatar: 'https://avatars.githubusercontent.com/u/97380258?s=200&v=4',
-      url: 'https://github.com/continuedev/continue',
-      updated_at: '2024-01-27'
+      name: 'novita-ai',
+      full_name: 'novita-ai/novita',
+      description: 'Fast and scalable LLM API.',
+      stars: 1900,
+      forks: 150,
+      language: 'Python',
+      author: 'novita-ai',
+      avatar: 'https://avatars.githubusercontent.com/u/133175152?s=200&v=4',
+      url: 'https://github.com/novita-ai/novita',
+      updated_at: 'This week'
     }
   ]
 }
@@ -237,29 +236,15 @@ const languageColors: Record<string, string> = {
   'C++': 'bg-pink-500',
   'HTML': 'bg-orange-400',
   'CSS': 'bg-blue-400',
-  'Svelte': 'bg-orange-600',
+  'Jupyter': 'bg-orange-600',
   'Vue': 'bg-green-500',
 }
 
 function formatStars(count: number): string {
-  if (count >= 10000) {
-    return (count / 10000).toFixed(1) + 'k'
+  if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'k'
   }
   return count.toString()
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    const date = new Date(dateStr)
-    const now = new Date()
-    const diffHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffHours < 48) return 'Yesterday'
-    return `${Math.floor(diffHours / 24)}d ago`
-  } catch {
-    return 'Recently'
-  }
 }
 
 export default function GitHubPage() {
@@ -452,7 +437,7 @@ function RepoCard({ repo, index }: { repo: GitHubRepo; index: number }) {
           </div>
           <div className="flex items-center gap-1 text-slate-500 ml-auto">
             <Clock className="w-3 h-3" />
-            <span>{formatDate(repo.updated_at)}</span>
+            <span>{repo.updated_at}</span>
           </div>
         </div>
         
