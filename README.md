@@ -7,7 +7,7 @@
 - 📰 聚合多个 AI 新闻源（Google News RSS）
 - 🏷️ 分类筛选（行业动态、AI应用、政策安全等）
 - 🔄 每 30 分钟自动更新 + 手动刷新
-- 👤 GitHub / Google OAuth 登录
+- 👤 GitHub OAuth 登录
 - 📱 响应式设计（移动端适配）
 - ✨ 极客风格 UI（星空、粒子、霓虹特效）
 
@@ -48,21 +48,12 @@ cp .env.example .env.local
    - Callback URL: http://localhost:3000/api/auth/callback/github
 4. 复制 Client ID 和 Client Secret 到 `.env.local`
 
-### Google OAuth
-1. 打开 https://console.cloud.google.com/apis/credentials
-2. Create Credentials → OAuth client ID
-3. 设置：
-   - Application type: Web application
-   - Authorized JavaScript origins: http://localhost:3000
-   - Authorized redirect URIs: http://localhost:3000/api/auth/callback/google
-4. 复制 Client ID 和 Client Secret 到 `.env.local`
-
 ### Vercel 部署
 部署时在 Vercel Dashboard 的 Environment Variables 中添加：
-- `NEXTAUTH_URL`: 你的 Vercel 域名
-- `NEXTAUTH_SECRET`: 使用 `openssl rand -base64 32` 生成
-- `GITHUB_ID` / `GITHUB_SECRET`
-- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`
+- `NEXTAUTH_URL`: `https://ai-news-bice.vercel.app`
+- `NEXTAUTH_SECRET`: `6P38//CztY61tS57cz5H7MwrUvBiMFQ9SwD3MrOK3kY=`
+- `GITHUB_ID`: `Ov23li5L1BQzlLMNTYkR`
+- `GITHUB_SECRET`: `9e43c4fce8d4d49d7483ac4c2e9c98324f1a7cc9`
 
 ## 新闻源
 
@@ -71,11 +62,17 @@ cp .env.example .env.local
 ## 技术栈
 
 - **框架**: Next.js 14 (App Router)
-- **认证**: NextAuth.js
+- **认证**: NextAuth.js (GitHub)
 - **样式**: Tailwind CSS + Framer Motion
-- **部署**: Vercel
+- **部署**: Vercel + GitHub Actions
 
 ## 访问
 
 开发环境: http://localhost:3000
 生产环境: https://ai-news-bice.vercel.app
+
+## 自动化脚本
+
+- `setup.sh` - 一键配置 Vercel 部署
+- `status.sh` - 检查部署状态
+- `.github/workflows/deploy.yml` - 自动构建部署
