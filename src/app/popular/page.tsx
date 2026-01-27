@@ -8,9 +8,7 @@ import {
   Zap, 
   Flame,
   ArrowUp,
-  RefreshCw,
-  Clock,
-  ExternalLink
+  RefreshCw
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Starfield from '@/components/effects/Starfield'
@@ -29,30 +27,17 @@ interface PopularItem {
   url: string
 }
 
-const generatePopularItems = (): PopularItem[] => [
-  { id: '1', title: 'OpenAI GPT-5 Rumors: What We Know About the Next Generation', source: 'The Verge', category: 'Industry', views: '2.3M', timestamp: '2h', url: '#' },
-  { id: '2', title: 'EU Parliament Passes Comprehensive AI Act: Key Points', source: 'TechCrunch', category: 'Policy', views: '1.8M', timestamp: '4h', url: '#' },
-  { id: '3', title: 'NVIDIA CEO Reveals Roadmap for Next-Gen AI Chips', source: 'Reuters', category: 'Industry', views: '1.5M', timestamp: '6h', url: '#' },
-  { id: '4', title: 'Midjourney V7: Stunning New Features and Capabilities', source: 'Wired', category: 'Apps', views: '1.2M', timestamp: '8h', url: '#' },
-  { id: '5', title: 'Google DeepMind AlphaFold 3: Drug Discovery Revolution', source: 'MIT Tech', category: 'Industry', views: '980K', timestamp: '10h', url: '#' },
-  { id: '6', title: 'Claude 3.5 vs GPT-4: The Ultimate Comparison', source: 'Ars Tech', category: 'Apps', views: '876K', timestamp: '12h', url: '#' },
-  { id: '7', title: 'China\'s New AI Regulations: What Companies Need', source: 'Bloomberg', category: 'Policy', views: '754K', timestamp: 'Yesterday', url: '#' },
-  { id: '8', title: 'Apple Silicon M4 Chip: AI Performance Breakthrough', source: 'The Verge', category: 'Industry', views: '689K', timestamp: 'Yesterday', url: '#' },
-  { id: '9', title: 'Runway Gen-3 Alpha: Text-to-Video Revolution', source: 'TechCrunch', category: 'Apps', views: '612K', timestamp: '2d', url: '#' },
-  { id: '10', title: 'Meta LLaMA 4 Leaks: Performance Benchmarks', source: 'Wired', category: 'Industry', views: '567K', timestamp: '2d', url: '#' },
-  { id: '11', title: 'Tesla Optimus: New Demo Shows Humanoid Progress', source: 'Reuters', category: 'Industry', views: '523K', timestamp: '2d', url: '#' },
-  { id: '12', title: 'AI in Healthcare: FDA Approvals Hit Record High', source: 'MIT News', category: 'Apps', views: '498K', timestamp: '3d', url: '#' },
-]
-
 const categoryStyles: Record<string, { bg: string; text: string; border: string }> = {
   Industry: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
   Policy: { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30' },
   Apps: { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
+  Tech: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30' },
 }
 
 export default function PopularPage() {
   const { t } = useLanguage()
-  const [items] = useState<PopularItem[]>(generatePopularItems)
+  const [items, setItems] = useState<PopularItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [columnCount, setColumnCount] = useState(1)
   const [showBackToTop, setShowBackToTop] = useState(false)
@@ -76,12 +61,33 @@ export default function PopularPage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const refreshData = () => {
+  const fetchPopular = async () => {
+    try {
+      const res = await fetch('/api/popular?t=' + Date.now(), {
+        cache: 'no-store'
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setItems(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch popular news:', error)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchPopular()
+  }, [])
+
+  const refreshData = async () => {
     setIsRefreshing(true)
-    setTimeout(() => setIsRefreshing(false), 1500)
+    await fetchPopular()
+    setIsRefreshing(false)
   }
 
   const columns: PopularItem[][] = Array.from({ length: columnCount }, () => [])
+  
   items.forEach((item, index) => {
     columns[index % columnCount].push(item)
   })
@@ -134,15 +140,19 @@ export default function PopularPage() {
       
       {/* Cards Grid */}
       <main className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {columns.map((column, colIndex) => (
-            <div key={colIndex} className="flex flex-col gap-4">
-              {column.map((item, itemIndex) => (
-                <PopularCard key={item.id} item={item} index={itemIndex} />
-              ))}
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="bg-slate-900/60 backdrop-blur-xl rounded-2xl p-5 border border-slate-800/60 h-40 animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.map((item, index) => (
+              <PopularCard key={item.id} item={item} index={index} />
+            ))}
+          </div>
+        )}
       </main>
       
       {/* Back to Top */}
