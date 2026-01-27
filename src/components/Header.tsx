@@ -6,12 +6,19 @@ import { Menu, X, Sparkles, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlitchText } from '@/components/effects/CyberComponents'
 import AuthButton from '@/components/auth/AuthButton'
+import LanguageSwitcher from '@/locales/LanguageSwitcher'
+import { useLanguage } from '@/locales/LanguageContext'
 
 export default function Header() {
+  const { t } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  const navItems = ['Latest', 'Popular', 'About']
+  const navItems = [
+    { key: 'navLatest', href: '#' },
+    { key: 'navPopular', href: '#' },
+    { key: 'navAbout', href: '#' },
+  ]
 
   return (
     <motion.header
@@ -70,8 +77,8 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item, index) => (
               <motion.a
-                key={item}
-                href="#"
+                key={item.key}
+                href={item.href}
                 className={cn(
                   "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300",
                   index === 0 ? "text-white" : "text-slate-400 hover:text-white"
@@ -81,7 +88,7 @@ export default function Header() {
                 transition={{ delay: 0.1 * index }}
                 whileHover={{ scale: 1.05 }}
               >
-                <span className="relative z-10">{item}</span>
+                <span className="relative z-10">{t(item.key)}</span>
                 {index === 0 && (
                   <motion.div
                     className="absolute inset-0 bg-slate-800/50 rounded-lg"
@@ -93,8 +100,9 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Actions - Auth Button + Subscribe */}
+          {/* Actions - Language + Auth + Subscribe */}
           <div className="flex items-center gap-2 md:gap-3">
+            <LanguageSwitcher />
             <AuthButton />
             
             <motion.button
@@ -103,7 +111,7 @@ export default function Header() {
               whileTap={{ scale: 0.98 }}
             >
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">Subscribe</span>
+              <span className="hidden sm:inline">{t('subscribe')}</span>
             </motion.button>
             
             <motion.button
@@ -157,15 +165,15 @@ export default function Header() {
                 <nav className="flex flex-col gap-2">
                   {navItems.map((item, index) => (
                     <motion.a
-                      key={item}
-                      href="#"
+                      key={item.key}
+                      href={item.href}
                       className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-300"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 * index }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      {item}
+                      {t(item.key)}
                     </motion.a>
                   ))}
                   <div className="border-t border-slate-700/50 my-2 pt-2">
@@ -177,7 +185,7 @@ export default function Header() {
                       whileTap={{ scale: 0.98 }}
                     >
                       <Zap className="w-4 h-4" />
-                      Subscribe
+                      {t('subscribe')}
                     </motion.button>
                   </div>
                 </nav>
