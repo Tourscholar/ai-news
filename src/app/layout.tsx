@@ -2,11 +2,16 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
-  title: 'AI News Daily',
-  description: 'Daily AI news aggregator',
+  title: 'AI News Daily | Your Daily AI News Aggregator',
+  description: 'Stay ahead with artificial intelligence news, insights, and trends from the world\'s leading sources. Updated hourly.',
+  keywords: ['AI', 'Artificial Intelligence', 'News', 'Tech', 'Machine Learning'],
 }
 
 export default function RootLayout({
@@ -15,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900`}>
+    <html lang="en" suppressHydrationWarning className="scrollbar-premium">
+      <body className={`${inter.className} antialiased min-h-screen`}>
         {children}
       </body>
     </html>
