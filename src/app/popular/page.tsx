@@ -226,9 +226,6 @@ function PopularCard({ item, index }: { item: PopularItem; index: number }) {
             <span className="text-sm font-medium text-amber-400">{item.views}</span>
           </div>
         </div>
-        
-        {/* Arrow icon */}
-        <ExternalLink className="absolute bottom-5 right-5 w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
       </div>
     </motion.a>
   )
