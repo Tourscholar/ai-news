@@ -10,41 +10,57 @@ interface GlitchTextProps {
 }
 
 export function GlitchText({ text, className, as: Component = 'span' }: GlitchTextProps) {
+  // Create motion component
+  const MotionComponent = motion.create(Component as any)
+  
+  const glitchVariants = {
+    initial: { x: 0, opacity: 0.7 },
+    animate: {
+      x: [-2, 2, -2, 0],
+      opacity: [0.7, 0, 0.7, 0.7],
+      transition: {
+        duration: 0.3,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+        repeatDelay: 2 + Math.random() * 2,
+      },
+    },
+  }
+
   return (
     <div className={cn('relative inline-block', className)}>
       <Component className="relative z-10">{text}</Component>
-      <Component
+      
+      {/* Red layer */}
+      <MotionComponent
         className="absolute top-0 left-0 -z-10 text-red-500 opacity-70"
         style={{ clipPath: 'polygon(0 0, 100% 0, 100% 45%, 0 45%)' }}
-        animate={{
-          x: [-2, 2, -2, 0],
-          opacity: [0.7, 0, 0.7, 0.7],
-        }}
-        transition={{
-          duration: 0.3,
-          repeat: Infinity,
-          repeatType: 'loop',
-          repeatDelay: Math.random() * 3 + 2,
-        }}
+        initial="initial"
+        animate="animate"
+        variants={glitchVariants}
       >
         {text}
-      </Component>
-      <Component
+      </MotionComponent>
+      
+      {/* Cyan layer */}
+      <MotionComponent
         className="absolute top-0 left-0 -z-10 text-cyan-500 opacity-70"
         style={{ clipPath: 'polygon(0 55%, 100% 55%, 100% 100%, 0 100%)' }}
-        animate={{
-          x: [2, -2, 2, 0],
-          opacity: [0.7, 0, 0.7, 0.7],
-        }}
-        transition={{
-          duration: 0.3,
-          repeat: Infinity,
-          repeatType: 'loop',
-          repeatDelay: Math.random() * 3 + 2,
+        initial="initial"
+        animate="animate"
+        variants={{
+          ...glitchVariants,
+          animate: {
+            ...glitchVariants.animate,
+            transition: {
+              ...glitchVariants.animate.transition,
+              repeatDelay: 3 + Math.random() * 2,
+            },
+          },
         }}
       >
         {text}
-      </Component>
+      </MotionComponent>
     </div>
   )
 }
