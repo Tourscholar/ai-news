@@ -16,80 +16,76 @@ interface GitHubRepo {
 
 export async function GET() {
   try {
-    // Fetch GitHub Trending page server-side (no CORS issue)
-    const res = await fetch('https://github.com/trending?since=weekly&spoken_language_code=en', {
-      next: { revalidate: 3600 },
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+    // Try multiple sources
+    const sources = [
+      // Source 1: GitHub Trending via RSS (more reliable)
+      { url: 'https://github-trending-api.pages.dev/repos?language=&since=weekly', parse: parseAPIResponse },
+      // Source 2: Alternative trending API
+      { url: 'https://ghproxy.net/https://raw.githubusercontent.com/josephz/web-trending-repos/main/data/weekly.json', parse: parseWeeklyJSON },
+    ]
+    
+    for (const source of sources) {
+      try {
+        const res = await fetch(source.url, {
+          next: { revalidate: 1800 },
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          signal: AbortSignal.timeout(10000)
+        })
+        
+        if (res.ok) {
+          const data = await res.json()
+          const repos = source.parse(data)
+          if (repos.length > 0) {
+            return NextResponse.json(repos)
+          }
+        }
+      } catch (e) {
+        console.log(`Source ${source.url} failed, trying next...`)
       }
-    })
-    
-    if (!res.ok) {
-      throw new Error('Failed to fetch GitHub trending')
     }
     
-    const html = await res.text()
-    
-    const repoItems: GitHubRepo[] = []
-    const articleRegex = /<article class="Box-item">([\s\S]*?)<\/article>/g
-    let articleMatch
-    let count = 0
-    
-    while ((articleMatch = articleRegex.exec(html)) !== null && count < 12) {
-      const article = articleMatch[1]
-      
-      // Extract author and repo name
-      const repoLinkMatch = article.match(/<a href="\/([^"]+)\/([^"]+)">/)
-      const author = repoLinkMatch?.[1] || 'unknown'
-      const repoName = repoLinkMatch?.[2] || 'unknown'
-      
-      // Extract description
-      const descMatch = article.match(/<p[^>]*class="[^"]*color-fg-muted[^"]*"[^>]*>([^<]+)<\/p>/)
-      const description = descMatch?.[1]?.trim() || ''
-      
-      // Extract star count
-      const starMatch = article.match(/<svg[^>]*aria-label="star"[^>]*><\/svg>\s*([\d,]+)/)
-      const stars = parseInt(starMatch?.[1]?.replace(/,/g, '') || '0')
-      
-      // Calculate weekly stars (GitHub shows total stars, estimate weekly)
-      const starThisWeekMatch = article.match(/([\d,]+)\s*stars?\s*this\s*week/i)
-      const starsThisWeek = starThisWeekMatch 
-        ? parseInt(starThisWeekMatch[1]?.replace(/,/g, '') || '0')
-        : Math.floor(stars / 7)
-      
-      // Extract fork count
-      const forkMatch = article.match(/<svg[^>]*aria-label="fork"[^>]*><\/svg>\s*([\d,]+)/)
-      const forks = parseInt(forkMatch?.[1]?.replace(/,/g, '') || '0')
-      
-      // Extract language
-      const langMatch = article.match(/<span[^>]*class="[^"]*d-inline-flex[^"]*"[^>]*>([^<]+)<\/span>/)
-      const language = langMatch?.[1]?.trim() || ''
-      
-      // Generate avatar URL
-      const avatar = `https://avatars.githubusercontent.com/u/${Math.abs(author.charCodeAt(0) * 1000 + author.length) % 1000000}?v=4`
-      
-      repoItems.push({
-        id: count,
-        name: repoName,
-        full_name: `${author}/${repoName}`,
-        description: description || 'No description available',
-        stars,
-        forks,
-        language: language || 'Unknown',
-        author,
-        avatar,
-        url: `https://github.com/${author}/${repoName}`,
-        starsThisWeek
-      })
-      
-      count++
-    }
-    
-    return NextResponse.json(repoItems)
+    // If all sources fail, use static sample data
+    return NextResponse.json(getSampleRepos())
   } catch (error) {
-    console.error('Failed to fetch GitHub trending:', error)
+    console.error('GitHub trending error:', error)
     return NextResponse.json(getSampleRepos())
   }
+}
+
+function parseAPIResponse(data: any): GitHubRepo[] {
+  if (!Array.isArray(data)) return []
+  
+  return data.slice(0, 12).map((repo: any, index: number) => ({
+    id: repo.id || index,
+    name: repo.name || repo.repo?.name || 'unknown',
+    full_name: repo.full_name || repo.repo?.path || 'unknown/unknown',
+    description: repo.description || repo.repo?.description || 'No description',
+    stars: repo.stars || repo.starsCount || 0,
+    forks: repo.forks || repo.forksCount || 0,
+    language: repo.language || repo.repo?.language || 'Unknown',
+    author: repo.author || repo.repo?.owner?.username || 'unknown',
+    avatar: repo.avatar || repo.repo?.owner?.avatar || `https://github.com/${repo.author}.png`,
+    url: repo.url || `https://github.com/${repo.full_name || repo.repo?.path}`,
+    starsThisWeek: repo.starsThisWeek || repo.todayStars || Math.floor((repo.stars || 0) / 30)
+  }))
+}
+
+function parseWeeklyJSON(data: any): GitHubRepo[] {
+  if (!Array.isArray(data)) return []
+  
+  return data.slice(0, 12).map((repo: any, index: number) => ({
+    id: index,
+    name: repo.name,
+    full_name: repo.fullName,
+    description: repo.description || 'No description',
+    stars: repo.stars || repo.stargazersCount || 0,
+    forks: repo.forks || repo.forksCount || 0,
+    language: repo.language || 'Unknown',
+    author: repo.author || repo.owner?.username || 'unknown',
+    avatar: repo.avatar || `https://github.com/${repo.author}.png`,
+    url: repo.url || `https://github.com/${repo.fullName}`,
+    starsThisWeek: repo.starsThisWeek || Math.floor((repo.stars || 0) / 30)
+  }))
 }
 
 function getSampleRepos(): GitHubRepo[] {
