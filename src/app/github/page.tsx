@@ -26,9 +26,9 @@ interface GitHubRepo {
 
 async function fetchGitHubTrending(): Promise<GitHubRepo[]> {
   try {
-    // Call our API endpoint which handles CORS
-    const res = await fetch('/api/github', {
-      next: { revalidate: 3600 }
+    // Call our API endpoint with timestamp to avoid caching
+    const res = await fetch(`/api/github?t=${Date.now()}`, {
+      next: { revalidate: 300 } // 5 minutes cache
     })
     
     if (!res.ok) throw new Error('Failed to fetch')

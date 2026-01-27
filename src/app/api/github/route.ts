@@ -22,8 +22,10 @@ export async function GET() {
     const res = await fetch(searchUrl, {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'AI-News-Bot'
+        'User-Agent': 'AI-News-Bot',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
       },
+      cache: 'no-store',
       signal: AbortSignal.timeout(15000)
     })
     
@@ -45,76 +47,21 @@ export async function GET() {
           starsThisWeek: Math.max(10, Math.floor(repo.stargazers_count / (30 + Math.random() * 60)))
         }))
         
-        return NextResponse.json(repos)
+        return NextResponse.json(repos, {
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        })
       }
     }
     
-    // 方法2: 如果GitHub API失败，尝试trending页面
     throw new Error('GitHub API failed')
   } catch (error) {
     console.error('GitHub API error:', error)
     
-    try {
-      // 方法2: 尝试GitHub Trending RSS (通过代理)
-      const trendingRes = await fetch('https://ghproxy.net/https://github.com/trending.atom?since=weekly', {
-        signal: AbortSignal.timeout(10000)
-      })
-      
-      if (trendingRes.ok) {
-        const xml = await trendingRes.text()
-        const repos = parseAtomFeed(xml)
-        if (repos.length > 0) {
-          return NextResponse.json(repos)
-        }
-      }
-    } catch (e) {
-      console.error('Trending fetch error:', e)
-    }
-    
     // 返回示例数据
     return NextResponse.json(getSampleRepos())
   }
-}
-
-function parseAtomFeed(xml: string): GitHubRepo[] {
-  const repos: GitHubRepo[] = []
-  const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/g
-  let match
-  let count = 0
-  
-  while ((match = entryRegex.exec(xml)) !== null && count < 12) {
-    const entry = match[1]
-    
-    const titleMatch = entry.match(/<title>([^<]+)<\/title>/)
-    const fullName = titleMatch?.[1] || ''
-    const [author, name] = fullName.split('/')
-    
-    const summaryMatch = entry.match(/<summary[^>]*>([^<]+)<\/summary>/)
-    const description = summaryMatch?.[1]?.trim() || 'No description'
-    
-    const linkMatch = entry.match(/<link[^>]*href="([^"]+)"[^>]*>/)
-    const url = linkMatch?.[1] || ''
-    
-    const updatedMatch = entry.match(/<updated>([^<]+)<\/updated>/)
-    
-    repos.push({
-      id: count,
-      name: name || 'unknown',
-      full_name: fullName || 'unknown/unknown',
-      description,
-      stars: Math.floor(Math.random() * 5000) + 500,
-      forks: Math.floor(Math.random() * 500) + 50,
-      language: 'Unknown',
-      author: author || 'unknown',
-      avatar: `https://github.com/${author}.png`,
-      url,
-      starsThisWeek: Math.floor(Math.random() * 300) + 50
-    })
-    
-    count++
-  }
-  
-  return repos
 }
 
 function getSampleRepos(): GitHubRepo[] {
