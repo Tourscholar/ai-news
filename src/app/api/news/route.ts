@@ -17,7 +17,8 @@ function categorizeNews(title: string): string {
       lowerTitle.includes('safety') || lowerTitle.includes('security') ||
       lowerTitle.includes('privacy') || lowerTitle.includes('risk') ||
       lowerTitle.includes('govern') || lowerTitle.includes('policy') ||
-      lowerTitle.includes('compliance') || lowerTitle.includes(' antitrust')) {
+      lowerTitle.includes('compliance') || lowerTitle.includes('antitrust') ||
+      lowerTitle.includes('congress') || lowerTitle.includes('legislation')) {
     return 'policy'
   }
   
@@ -26,7 +27,8 @@ function categorizeNews(title: string): string {
       lowerTitle.includes('announce') || lowerTitle.includes('update') ||
       lowerTitle.includes('feature') || lowerTitle.includes('product') ||
       lowerTitle.includes('tool') || lowerTitle.includes('version') ||
-      lowerTitle.includes('beta') || lowerTitle.includes('preview')) {
+      lowerTitle.includes('beta') || lowerTitle.includes('preview') ||
+      lowerTitle.includes('launches') || lowerTitle.includes('releases')) {
     return 'application'
   }
   
@@ -36,7 +38,8 @@ function categorizeNews(title: string): string {
       lowerTitle.includes('anthropic') || lowerTitle.includes('apple') ||
       lowerTitle.includes('deepmind') || lowerTitle.includes('xai') ||
       lowerTitle.includes('mistral') || lowerTitle.includes('hugging face') ||
-      lowerTitle.includes('stability ai') || lowerTitle.includes('inflection')) {
+      lowerTitle.includes('stability ai') || lowerTitle.includes('inflection') ||
+      lowerTitle.includes('runway') || lowerTitle.includes('midjourney')) {
     return 'industry'
   }
   
@@ -65,14 +68,21 @@ function formatTimestamp(dateStr: string): string {
   }
 }
 
-async function fetchRSS(url: string, source: string): Promise<NewsItem[]> {
+async function fetchRSS(url: string, source: string, timeout = 10000): Promise<NewsItem[]> {
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    
     const res = await fetch(url, {
       next: { revalidate: 1800 },
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AI-News-Bot/1.0)'
-      }
+        'User-Agent': 'Mozilla/5.0 (compatible; AI-News-Bot/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+      },
+      signal: controller.signal
     })
+    
+    clearTimeout(timeoutId)
     
     if (!res.ok) return []
     
@@ -82,7 +92,7 @@ async function fetchRSS(url: string, source: string): Promise<NewsItem[]> {
     let match
     let itemCount = 0
     
-    while ((match = itemRegex.exec(xmlText)) !== null && itemCount < 10) {
+    while ((match = itemRegex.exec(xmlText)) !== null && itemCount < 8) {
       const itemContent = match[1]
       
       // Extract title
@@ -91,7 +101,8 @@ async function fetchRSS(url: string, source: string): Promise<NewsItem[]> {
       if (!titleMatch) continue
       
       const title = titleMatch[1].trim()
-      if (title.length < 20 || title.toLowerCase().includes('feed') || title.includes('RSS')) continue
+      if (title.length < 20 || title.toLowerCase().includes('feed') || 
+          title.includes('RSS') || title.includes('404') || title.includes('Not Found')) continue
       
       // Extract link
       const linkMatch = itemContent.match(/<link>(.*?)<\/link>/)
@@ -104,7 +115,7 @@ async function fetchRSS(url: string, source: string): Promise<NewsItem[]> {
       const timestamp = pubDateMatch ? formatTimestamp(pubDateMatch[1]) : 'Recently'
       
       news.push({
-        id: `${source.toLowerCase().replace(/\s/g, '-')}-${itemCount}`,
+        id: `${source.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${itemCount}-${Date.now()}`,
         title,
         source,
         category: categorizeNews(title),
@@ -117,25 +128,22 @@ async function fetchRSS(url: string, source: string): Promise<NewsItem[]> {
     
     return news
   } catch (error) {
-    console.error(`Failed to fetch from ${source}:`, error)
+    // Silently fail for individual feeds
     return []
   }
 }
 
-async function fetchTwitterNews(): Promise<NewsItem[]> {
+async function fetchAI_news(): Promise<NewsItem[]> {
+  // Main AI news sources
+  const sources = [
+    { url: 'https://news.mit.edu/rss/topic/artificial-intelligence2', source: 'MIT News' },
+    { url: 'https://news.google.com/rss/search?q=artificial%20intelligence&hl=en-US&gl=US&ceid=US:en', source: 'Google News' },
+    { url: 'https://news.ycombinator.com/rss?q=ai', source: 'Hacker News' },
+  ]
+  
   try {
-    // Twitter RSS feeds for major AI accounts
-    const twitterFeeds = [
-      { url: 'https://nitter.net/OpenAI/rss', source: 'OpenAI' },
-      { url: 'https://nitter.net/AndrewNG/statuses', source: 'Andrew Ng' },
-      { url: 'https://nitter.net/sama/rss', source: 'Sam Altman' },
-      { url: 'https://nitter.net/ylecun/rss', source: 'Yann LeCun' },
-      { url: 'https://nitter.net/JeffDean/rss', source: 'Jeff Dean' },
-    ]
-    
-    // Try nitter (Twitter RSS alternative) - some might be down
     const results = await Promise.allSettled(
-      twitterFeeds.map(feed => fetchRSS(feed.url, feed.source))
+      sources.map(s => fetchRSS(s.url, s.source))
     )
     
     const allNews: NewsItem[] = []
@@ -145,88 +153,69 @@ async function fetchTwitterNews(): Promise<NewsItem[]> {
       }
     })
     
-    // If we got Twitter news, deduplicate and return
-    if (allNews.length > 0) {
-      const seenTitles = new Set<string>()
-      return allNews.filter(item => {
-        const normalized = item.title.toLowerCase().trim()
-        if (seenTitles.has(normalized)) return false
-        seenTitles.add(normalized)
-        return true
-      }).slice(0, 10)
-    }
-    
-    return []
+    return allNews
   } catch (error) {
-    console.error('Failed to fetch Twitter news:', error)
     return []
   }
 }
 
 async function fetchAuthoritativeNews(): Promise<NewsItem[]> {
-  // RSS feeds from authoritative tech/AI news sources
-  const rssFeeds = [
+  // Tech news sources
+  const sources = [
+    { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch' },
     { url: 'https://www.theverge.com/rss/index.xml', source: 'The Verge' },
-    { url: 'https://techcrunch.com/feed/', source: 'TechCrunch' },
-    { url: 'https://www.wired.com/feed/rss', source: 'Wired' },
-    { url: 'https://www.reutersagency.com/feed/', source: 'Reuters' },
+    { url: 'https://www.wired.com/feed/category/science/latest/rss', source: 'Wired' },
+    { url: 'https://arstechnica.com/feed/', source: 'Ars Technica' },
     { url: 'https://www.technologyreview.com/feed/', source: 'MIT Tech Review' },
-    { url: 'https://news.mit.edu/rss/topic/artificial-intelligence2', source: 'MIT News' },
-    { url: 'https://research.facebook.com/blog/rss', source: 'Meta AI' },
-    { url: 'https://www.deepmind.com/blog/rss', source: 'DeepMind' },
   ]
   
   try {
     const results = await Promise.allSettled(
-      rssFeeds.map(feed => fetchRSS(feed.url, feed.source))
+      sources.map(s => fetchRSS(s.url, s.source, 8000))
     )
     
     const allNews: NewsItem[] = []
     results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
+      if (result.status === 'fulfilled' && result.value.length > 0) {
         allNews.push(...result.value)
       }
     })
     
     return allNews
   } catch (error) {
-    console.error('Failed to fetch authoritative news:', error)
     return []
   }
 }
 
 export async function GET() {
   try {
-    // Fetch from multiple sources concurrently
-    const [twitterNews, authoritativeNews] = await Promise.all([
-      fetchTwitterNews(),
+    // Fetch from multiple sources concurrently with shorter timeout
+    const [mainNews, techNews] = await Promise.all([
+      fetchAI_news(),
       fetchAuthoritativeNews()
     ])
     
-    // Combine and prioritize authoritative sources
-    let combinedNews = [...authoritativeNews]
-    
-    // Add Twitter news if we got any (as supplemental)
-    if (twitterNews.length > 0) {
-      combinedNews = [...combinedNews, ...twitterNews]
-    }
+    // Combine results
+    let combinedNews = [...mainNews, ...techNews]
     
     // Deduplicate based on title
     const seenTitles = new Set<string>()
     const uniqueNews = combinedNews.filter(item => {
       const normalizedTitle = item.title.toLowerCase().trim()
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, ' ')
       if (seenTitles.has(normalizedTitle)) return false
       seenTitles.add(normalizedTitle)
       return true
     })
     
-    // Sort by category priority: industry > application > policy > other
-    const categoryOrder: Record<string, number> = { industry: 0, application: 1, policy: 2, other: 3 }
+    // Sort by recency (newer first)
     uniqueNews.sort((a, b) => {
-      const orderDiff = categoryOrder[a.category] - categoryOrder[b.category]
-      if (orderDiff !== 0) return orderDiff
-      // Secondary sort by recency
-      return 0
+      const timeA = a.timestamp.replace(/[hd]/g, '').replace('Just now', '0').replace('Yesterday', '24')
+      const timeB = b.timestamp.replace(/[hd]/g, '').replace('Just now', '0').replace('Yesterday', '24')
+      const numA = parseInt(timeA) || 999
+      const numB = parseInt(timeB) || 999
+      return numA - numB
     })
     
     // Return top 20 unique news items
@@ -289,10 +278,10 @@ function getSampleNews(): NewsItem[] {
     {
       id: 'sample-6',
       title: 'Meta releases new LLaMA 4 model with open-source licensing',
-      source: 'Meta AI',
+      source: 'Ars Technica',
       category: 'application',
       timestamp: 'Yesterday',
-      url: 'https://ai.meta.com'
+      url: 'https://arstechnica.com'
     }
   ]
 }
