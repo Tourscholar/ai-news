@@ -336,56 +336,46 @@ function PopularCard({ item, index, colorClass }: { item: PopularItem; index: nu
       onClick={() => window.open(item.url, '_blank')}
       className="group cursor-pointer h-full"
     >
-      <NeonCard 
-        glowColor={item.category as any} 
-        className="p-5 relative overflow-hidden h-full flex flex-col"
-      >
-        {/* Rank Badge */}
-        <motion.div
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-sm shrink-0`}
-          animate={isHovered ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
-          transition={{ duration: 0.5 }}
-        >
-          #{index + 1}
-        </motion.div>
+      <div className={`relative rounded-xl p-5 bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 h-full flex flex-col transition-all duration-300 group-hover:border-slate-600/70 ${isHovered ? 'shadow-2xl shadow-purple-500/10' : ''}`}>
+        
+        {/* Top accent line - subtle gradient */}
+        <div className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${colorClass} opacity-50 group-hover:opacity-100 transition-opacity`} />
+        
+        {/* Rank - Circle with gradient */}
+        <div className={`absolute top-4 right-4 w-7 h-7 rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center text-white font-bold text-xs shadow-lg`}>
+          {index + 1}
+        </div>
         
         {/* Category Badge */}
-        <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorClass} text-white mb-3 shrink-0`}>
+        <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-800/80 text-slate-300 mb-2`}>
           <TrendingUp className="w-3 h-3" />
           {item.category}
         </div>
         
-        {/* Title - Fixed height with truncation */}
-        <h2 className="text-lg font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-10 h-[4.5rem] overflow-hidden">
+        {/* Title - Fixed height with better typography */}
+        <h2 className="text-base font-semibold text-slate-200 group-hover:text-white leading-snug mb-3 pr-8 h-[4rem] overflow-hidden line-clamp-2">
           {item.title}
         </h2>
         
         {/* Meta - Push to bottom */}
-        <div className="mt-auto pt-3 border-t border-slate-700/50">
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-            <span className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-              <span className="truncate max-w-[80px]">{item.source}</span>
+        <div className="mt-auto pt-3 border-t border-slate-700/30">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              <span className="truncate max-w-[70px]">{item.source}</span>
             </span>
-            <span className="flex items-center gap-1 shrink-0">
-              <Clock className="w-3 h-3" />
+            <span className="flex items-center gap-1">
               {item.timestamp}
             </span>
           </div>
           
-          {/* Views */}
-          <div className="flex items-center gap-2 mt-2">
-            <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+          {/* Views - Cleaner design */}
+          <div className="flex items-center gap-1.5 mt-2">
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
             <span className="text-sm font-medium text-amber-400">{item.views}</span>
-            <span className="text-xs text-slate-500">{t('views')}</span>
           </div>
         </div>
-        
-        {/* Hover Glow Effect */}
-        <motion.div
-          className={`absolute inset-0 bg-gradient-to-r ${colorClass} opacity-0 group-hover:opacity-5 transition-opacity`}
-        />
-      </NeonCard>
+      </div>
     </motion.article>
   )
 }
