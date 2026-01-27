@@ -1,0 +1,66 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          GITHUB_ID: ${{ secrets.GITHUB_ID }}
+          GITHUB_SECRET: ${{ secrets.GITHUB_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+      - name: Deploy to Vercel
+        if: success()
+        run: |
+          npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Wait for deployment and check status
+        if: success()
+        run: |
+          echo "Deployment triggered. Waiting for build..."
+          sleep 30
+          
+          # Check if API responds
+          for i in {1..6}; do
+            if curl -s https://ai-news-bice.vercel.app/api/news | grep -q "google\|sample"; then
+              echo "✅ Deployment successful! API is responding."
+              exit 0
+            fi
+            echo "Waiting for deployment... ($i/6)"
+            sleep 10
+          done
+          
+          echo "Deployment may still be in progress. Check Vercel dashboard."
+          exit 1
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "❌ Build or deployment failed!"
+          echo "Please check the GitHub Actions log or Vercel dashboard."
+          exit 1
