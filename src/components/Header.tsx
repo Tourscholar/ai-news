@@ -57,7 +57,7 @@ export default function Header() {
             
             <div className="flex items-center gap-1 md:gap-2">
               <GlitchText
-                text="AI News"
+                text={t('siteTitle')}
                 className="font-bold text-lg md:text-xl tracking-tight"
                 as="span"
               />
@@ -68,7 +68,7 @@ export default function Header() {
                   x: isHovered ? 0 : -3,
                 }}
               >
-                Daily
+                {t('siteSubtitle')}
               </motion.span>
             </div>
           </motion.div>

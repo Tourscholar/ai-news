@@ -11,8 +11,10 @@ import {
   Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/locales/LanguageContext'
 
 export default function AuthButton() {
+  const { t } = useLanguage()
   const { data: session, status } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -72,7 +74,7 @@ export default function AuthButton() {
                 className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                {t('signOut')}
               </button>
             </motion.div>
           )}
@@ -97,7 +99,7 @@ export default function AuthButton() {
       whileTap={{ scale: 0.98 }}
     >
       <Sparkles className="w-4 h-4" />
-      <span>Sign In</span>
+      <span>{t('signIn')}</span>
     </motion.button>
   )
 }

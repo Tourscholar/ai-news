@@ -12,6 +12,7 @@ type TranslationFn = (key: string, params?: Record<string, string | number>) => 
 
 const translations: Record<string, Record<string, string>> = {
   zh: {
+    siteTitle: 'AI 新闻', siteSubtitle: '每日',
     navLatest: '最新', navPopular: '热门', navAbout: '关于',
     subscribe: '订阅', signIn: '登录', signOut: '退出',
     heroBadge: '实时 AI 新闻', heroTitle: '紧跟', heroSubtitle: '人工智能',
@@ -31,6 +32,7 @@ const translations: Record<string, Record<string, string>> = {
     backHome: '返回首页',
   },
   en: {
+    siteTitle: 'AI News', siteSubtitle: 'Daily',
     navLatest: 'Latest', navPopular: 'Popular', navAbout: 'About',
     subscribe: 'Subscribe', signIn: 'Sign In', signOut: 'Sign Out',
     heroBadge: 'Live AI News Feed', heroTitle: 'Stay Ahead with', 

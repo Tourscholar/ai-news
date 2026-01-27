@@ -16,14 +16,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="md:block hidden">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <Starfield />
         <MatrixRain />
         <ParticleGrid />
       </div>
       
-      {/* Mobile background */}
-      <div className="md:hidden fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 -z-10" />
+      {/* Mobile gradient background fallback */}
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 -z-10 md:hidden" />
       
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
