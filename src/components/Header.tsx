@@ -2,19 +2,13 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Sun, Moon, Sparkles, Zap } from 'lucide-react'
+import { Menu, X, Sparkles, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlitchText } from '@/components/effects/CyberComponents'
 
 export default function Header() {
-  const [darkMode, setDarkMode] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode)
-    document.documentElement.classList.toggle('dark')
-  }
 
   const navItems = ['Latest', 'Popular', 'About']
 
@@ -26,10 +20,10 @@ export default function Header() {
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
     >
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 md:h-16 items-center justify-between">
           {/* Logo */}
           <motion.div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-2 md:gap-3 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             whileHover={{ scale: 1.02 }}
@@ -42,35 +36,28 @@ export default function Header() {
               transition={{ duration: 0.5 }}
             >
               <div
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30"
-                style={{
-                  animation: isHovered ? 'pulse-glow 2s infinite' : 'none',
-                }}
+                className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg"
               >
-                <Sparkles className="w-5 h-5 text-white" />
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
-              {/* Glow ring */}
               <motion.div
-                className="absolute -inset-1 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-50 blur-sm"
-                animate={{
-                  scale: isHovered ? [1, 1.2, 1] : 1,
-                  opacity: isHovered ? [0.5, 0.8, 0.5] : 0.5,
-                }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-cyan-400 rounded-full"
+                animate={isHovered ? { scale: [1, 1.3, 1] } : {}}
+                transition={{ duration: 1, repeat: Infinity }}
               />
             </motion.div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
               <GlitchText
                 text="AI News"
-                className="font-bold text-xl tracking-tight text-white"
+                className="font-bold text-lg md:text-xl tracking-tight"
                 as="span"
               />
               <motion.span
-                className="text-gradient text-sm font-medium hidden sm:inline-block"
+                className="text-gradient text-xs md:text-sm font-medium hidden sm:inline-block"
                 animate={{
                   opacity: isHovered ? 1 : 0.7,
-                  x: isHovered ? 0 : -5,
+                  x: isHovered ? 0 : -3,
                 }}
               >
                 Daily
@@ -85,7 +72,7 @@ export default function Header() {
                 key={item}
                 href="#"
                 className={cn(
-                  "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300",
+                  "relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300",
                   index === 0 ? "text-white" : "text-slate-400 hover:text-white"
                 )}
                 initial={{ opacity: 0, y: -20 }}
@@ -105,44 +92,21 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Actions - Removed theme toggle */}
+          <div className="flex items-center gap-1 md:gap-2">
             <motion.button
-              onClick={toggleDarkMode}
-              className="p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 transition-all duration-300"
-              aria-label="Toggle dark mode"
-              whileHover={{ scale: 1.05, rotate: darkMode ? 15 : -15 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={{
-                  rotate: darkMode ? 180 : 0,
-                  scale: darkMode ? 0.9 : 1,
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                {darkMode ? (
-                  <Sun className="w-5 h-5 text-amber-400" />
-                ) : (
-                  <Moon className="w-5 h-5 text-indigo-400" />
-                )}
-              </motion.div>
-            </motion.button>
-            
-            <motion.button
-              className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl text-sm font-medium shadow-lg shadow-indigo-500/25"
+              className="hidden sm:flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-5 md:py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg md:rounded-xl text-sm font-medium shadow-lg"
               whileHover={{
                 scale: 1.02,
-                boxShadow: '0 0 30px rgba(99, 102, 241, 0.4)',
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <Zap className="w-4 h-4" />
-              <span>Subscribe</span>
+              <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Subscribe</span>
             </motion.button>
             
             <motion.button
-              className="md:hidden p-2.5 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 transition-all duration-300"
+              className="md:hidden p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 transition-all duration-300"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               whileTap={{ scale: 0.95 }}
             >
@@ -189,12 +153,12 @@ export default function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <nav className="flex flex-col gap-2">
+                <nav className="flex flex-col gap-1">
                   {navItems.map((item, index) => (
                     <motion.a
                       key={item}
                       href="#"
-                      className="px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-300"
+                      className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-300"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 * index }}
@@ -204,7 +168,7 @@ export default function Header() {
                     </motion.a>
                   ))}
                   <motion.button
-                    className="flex items-center justify-center gap-2 px-4 py-3 mt-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 mt-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}

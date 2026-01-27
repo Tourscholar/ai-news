@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { format } from 'date-fns'
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { 
   TrendingUp, 
   Cpu, 
@@ -39,14 +39,10 @@ export default function NewsList() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  useEffect(() => {
-    fetchNews()
-  }, [])
-
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     setIsRefreshing(true)
     try {
-      const res = await fetch('/api/news')
+      const res = await fetch('/api/news?t=' + Date.now())
       const data = await res.json()
       setNews(data)
       setLastUpdated(new Date())
@@ -56,7 +52,17 @@ export default function NewsList() {
       setLoading(false)
       setIsRefreshing(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchNews()
+  }, [fetchNews])
+
+  // Auto-refresh every 30 minutes
+  useEffect(() => {
+    const interval = setInterval(fetchNews, 30 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [fetchNews])
 
   const filteredNews = selectedCategory === 'all' 
     ? news 
@@ -68,18 +74,18 @@ export default function NewsList() {
         {/* Skeleton */}
         <div className="flex flex-wrap gap-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-10 w-24 bg-secondary/50 rounded-full animate-pulse" />
+            <div key={i} className="h-10 w-24 bg-slate-800/50 rounded-full animate-pulse" />
           ))}
         </div>
         <div className="grid gap-4">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="glass-card rounded-2xl p-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-secondary/50 rounded-xl animate-pulse" />
+                <div className="w-12 h-12 bg-slate-800/50 rounded-xl animate-pulse" />
                 <div className="flex-1 space-y-3">
-                  <div className="h-3 w-24 bg-secondary/50 rounded animate-pulse" />
-                  <div className="h-6 w-3/4 bg-secondary/50 rounded animate-pulse" />
-                  <div className="h-4 w-full bg-secondary/50 rounded animate-pulse" />
+                  <div className="h-3 w-24 bg-slate-800/50 rounded animate-pulse" />
+                  <div className="h-6 w-3/4 bg-slate-800/50 rounded animate-pulse" />
+                  <div className="h-4 w-full bg-slate-800/50 rounded animate-pulse" />
                 </div>
               </div>
             </div>
@@ -103,17 +109,21 @@ export default function NewsList() {
               onClick={() => setSelectedCategory(cat.id)}
               className={cn(
                 "relative group flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300",
-                "hover-scale hover-lift",
+                "hover-scale",
                 isActive 
                   ? "text-white" 
-                  : "glass-card text-muted-foreground hover:text-foreground"
+                  : "glass-card text-slate-400 hover:text-white"
               )}
             >
               {isActive && (
-                <div className={cn(
-                  "absolute inset-0 rounded-full bg-gradient-to-r opacity-100 transition-opacity",
-                  cat.color
-                )} />
+                <motion.div
+                  className={cn(
+                    "absolute inset-0 rounded-full bg-gradient-to-r opacity-100",
+                    cat.color
+                  )}
+                  layoutId="activeCategory"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
               )}
               <Icon className={cn(
                 "w-4 h-4 relative z-10",
@@ -126,26 +136,39 @@ export default function NewsList() {
       </div>
 
       {/* Last Updated & Refresh */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-3 text-sm text-slate-400">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            <span>Updated: {format(lastUpdated, 'HH:mm')}</span>
+            <span>Updated: {lastUpdated.toLocaleTimeString()}</span>
           </div>
+          <span className="hidden sm:inline text-slate-500">· Auto every 30min</span>
         </div>
-        <button
+        
+        <motion.button
           onClick={fetchNews}
           disabled={isRefreshing}
-          className="group flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-            bg-secondary/50 hover:bg-secondary transition-all duration-300
-            disabled:opacity-50 hover-scale"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
+            "bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 transition-all duration-300",
+            "disabled:opacity-50"
+          )}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <RefreshCw className={cn(
-            "w-4 h-4 transition-transform duration-500",
-            isRefreshing && "animate-spin"
-          )} />
+          <motion.div
+            animate={{ rotate: isRefreshing ? 360 : 0 }}
+            transition={{ duration: 1, repeat: isRefreshing ? Infinity : 0, ease: 'linear' }}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </motion.div>
           <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-        </button>
+        </motion.button>
+      </div>
+
+      {/* News Count */}
+      <div className="text-sm text-slate-500">
+        Showing {filteredNews.length} of {news.length} articles
       </div>
 
       {/* News List */}
@@ -156,25 +179,26 @@ export default function NewsList() {
           const colorClass = category.color
           
           return (
-            <article
+            <motion.article
               key={item.id}
-              className="group glass-card rounded-2xl p-5 hover-lift hover-glow cursor-pointer card-premium"
+              className="group glass-card rounded-2xl p-5 hover-lift cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ scale: 1.01, y: -2 }}
               onClick={() => window.open(item.url, '_blank')}
             >
               <div className="flex items-start gap-4">
                 {/* Category Icon */}
-                <div className="relative shrink-0">
-                  <div className={cn(
+                <motion.div 
+                  className={cn(
                     "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg",
                     colorClass
-                  )}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  {/* Sparkle effect on hover */}
-                  <div className="absolute -top-1 -right-1 w-4 h-4">
-                    <Sparkles className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                </div>
+                  )}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <Icon className="w-6 h-6 text-white" />
+                </motion.div>
                 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
@@ -183,24 +207,18 @@ export default function NewsList() {
                     <span className={cn(
                       "text-xs font-semibold px-2.5 py-1 rounded-full",
                       "bg-gradient-to-r from-indigo-500/10 to-purple-500/10",
-                      "text-indigo-600 dark:text-indigo-400",
-                      "border border-indigo-500/20"
+                      "text-indigo-400 border border-indigo-500/20"
                     )}>
                       {item.source}
                     </span>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
-                      {item.timestamp}
-                    </span>
+                    <span className="text-xs text-slate-500">{item.timestamp}</span>
                   </div>
                   
                   {/* Title */}
-                  <h2 className="text-lg font-semibold leading-snug 
-                    text-foreground group-hover:text-primary 
-                    transition-colors duration-300">
+                  <h2 className="text-lg font-semibold leading-snug text-slate-200 group-hover:text-white transition-colors">
                     <span className="flex items-center gap-2">
                       {item.title}
-                      <ExternalLink className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-muted-foreground" />
+                      <ExternalLink className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-slate-500 shrink-0" />
                     </span>
                   </h2>
                 </div>
@@ -210,14 +228,14 @@ export default function NewsList() {
               <div className="absolute top-4 right-4">
                 <div className={cn(
                   "px-2 py-0.5 rounded-full text-xs font-medium",
-                  "bg-gradient-to-r opacity-60 group-hover:opacity-100 transition-opacity",
+                  "bg-gradient-to-r opacity-70 group-hover:opacity-100 transition-opacity",
                   colorClass,
                   "text-white"
                 )}>
                   {category.label}
                 </div>
               </div>
-            </article>
+            </motion.article>
           )
         })}
       </div>
@@ -225,11 +243,9 @@ export default function NewsList() {
       {/* Empty State */}
       {filteredNews.length === 0 && (
         <div className="glass-card rounded-2xl p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/50 flex items-center justify-center">
-            <Lightbulb className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">No news found</h3>
-          <p className="text-muted-foreground">Try selecting a different category</p>
+          <Lightbulb className="w-12 h-12 mx-auto mb-4 text-slate-600" />
+          <h3 className="text-lg font-semibold mb-2 text-slate-400">No news found</h3>
+          <p className="text-slate-500">Try selecting a different category</p>
         </div>
       )}
     </div>
