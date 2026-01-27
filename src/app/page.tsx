@@ -1,9 +1,11 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import NewsList from '@/components/NewsList'
 import Header from '@/components/Header'
 import { Suspense } from 'react'
-import { Sparkles, Cpu, Zap, TrendingUp } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp } from 'lucide-react'
 import Starfield from '@/components/effects/Starfield'
 import MatrixRain from '@/components/effects/MatrixRain'
 import ParticleGrid from '@/components/effects/ParticleGrid'
@@ -12,6 +14,19 @@ import { useLanguage } from '@/locales/LanguageContext'
 
 export default function Home() {
   const { t } = useLanguage()
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
@@ -91,6 +106,22 @@ export default function Home() {
           <NewsList />
         </Suspense>
       </main>
+      
+      {/* Back to Top Button */}
+      <motion.button
+        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ 
+          opacity: showBackToTop ? 1 : 0,
+          scale: showBackToTop ? 1 : 0,
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={scrollToTop}
+        style={{ pointerEvents: showBackToTop ? 'auto' : 'none' }}
+      >
+        <ArrowUp className="w-5 h-5" />
+      </motion.button>
       
       {/* Footer */}
       <footer className="border-t border-slate-800 py-8 md:py-12 mt-12 relative z-10">

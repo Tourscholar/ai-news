@@ -10,96 +10,71 @@ interface PopularItem {
   url: string
 }
 
-// Get popular news from multiple sources
-async function fetchPopularNews(): Promise<PopularItem[]> {
+async function fetchHackerNews(): Promise<PopularItem[]> {
   try {
-    // Fetch from news API
-    const res = await fetch('https://api.github.com/search/repositories?q=stars:>10000+created:>2024-01-01&sort=stars&order=desc&per_page=30', {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'AI-News-Bot'
-      },
+    // Get top stories IDs
+    const idsRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=20&orderBy=%22$key%22', {
       cache: 'no-store',
       signal: AbortSignal.timeout(15000)
     })
     
-    if (res.ok) {
-      const data = await res.json()
-      
-      if (data.items && Array.isArray(data.items)) {
-        return data.items.slice(0, 12).map((repo: any, index: number) => ({
-          id: String(repo.id),
-          title: repo.description || `${repo.name}: A popular repository`,
-          source: repo.owner.login,
-          category: categorizeByLanguage(repo.language),
-          views: formatStars(repo.stargazers_count),
-          timestamp: getRelativeTime(new Date(repo.created_at)),
-          url: repo.html_url,
-        }))
-      }
-    }
-  } catch (error) {
-    console.error('Failed to fetch popular news:', error)
-  }
-  
-  // Fallback to Hacker News API
-  try {
-    const hnRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty&limitToFirst=15&orderBy=%22$key%22', {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(10000)
-    })
+    if (!idsRes.ok) throw new Error('Failed to fetch HN IDs')
     
-    if (hnRes.ok) {
-      const ids = await hnRes.json()
-      const storyPromises = ids.slice(0, 12).map((id: number) =>
-        fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`, { signal: AbortSignal.timeout(5000) })
-          .then(r => r.json())
-      )
-      
-      const stories = await Promise.all(storyPromises)
-      
-      return stories.filter(Boolean).map((story: any, index: number) => ({
+    const ids = await idsRes.json()
+    
+    // Fetch story details in parallel
+    const storyPromises = ids.slice(0, 12).map((id: number) =>
+      fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json?print=pretty`, {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(10000)
+      }).then(res => res.json())
+    )
+    
+    const stories = await Promise.all(storyPromises)
+    
+    return stories
+      .filter((story: any) => story && story.url) // Only stories with URLs
+      .map((story: any, index: number) => ({
         id: String(story.id),
         title: story.title,
-        source: story.by || 'Hacker News',
-        category: 'Tech',
+        source: extractDomain(story.url),
+        category: categorizeStory(story.url, story.title),
         views: formatNumber(story.score || 0),
         timestamp: getRelativeTime(new Date(story.time * 1000)),
-        url: story.url || `https://news.ycombinator.com/item?id=${story.id}`,
+        url: story.url,
       }))
-    }
   } catch (error) {
     console.error('Hacker News fetch error:', error)
+    return getSamplePopularNews()
   }
+}
+
+function extractDomain(url: string): string {
+  try {
+    const hostname = new URL(url).hostname
+    return hostname.replace('www.', '').split('.')[0].toUpperCase()
+  } catch {
+    return 'HN'
+  }
+}
+
+function categorizeStory(url: string, title: string): string {
+  const lower = (url + ' ' + title).toLowerCase()
   
-  // Return sample data as last resort
-  return getSamplePopularNews()
-}
-
-function categorizeByLanguage(language: string): string {
-  const categories: Record<string, string> = {
-    'Python': 'Industry',
-    'TypeScript': 'Industry',
-    'JavaScript': 'Industry',
-    'Go': 'Industry',
-    'Rust': 'Industry',
-    'Java': 'Industry',
-    'C++': 'Industry',
-    'Ruby': 'Industry',
-    'Swift': 'Industry',
-    'Kotlin': 'Industry',
+  if (lower.includes('ai') || lower.includes('gpt') || lower.includes('llm') || 
+      lower.includes('openai') || lower.includes('anthropic') || lower.includes('google') ||
+      lower.includes('microsoft') || lower.includes('nvidia')) {
+    return 'Industry'
   }
-  return categories[language] || 'Apps'
-}
-
-function formatStars(count: number): string {
-  if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M'
+  if (lower.includes('policy') || lower.includes('regulation') || lower.includes('eu ') ||
+      lower.includes('ban') || lower.includes('law')) {
+    return 'Policy'
   }
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K'
+  if (lower.includes('launch') || lower.includes('release') || lower.includes('new ') ||
+      lower.includes('introduce') || lower.includes('announce')) {
+    return 'Apps'
   }
-  return count.toString()
+  return 'Tech'
 }
 
 function formatNumber(count: number): string {
@@ -124,24 +99,24 @@ function getRelativeTime(date: Date): string {
 
 function getSamplePopularNews(): PopularItem[] {
   return [
-    { id: '1', title: 'OpenAI GPT-5 Rumors: What We Know About the Next Generation', source: 'The Verge', category: 'Industry', views: '2.3M', timestamp: '2h', url: 'https://www.theverge.com' },
-    { id: '2', title: 'EU Parliament Passes Comprehensive AI Act: Key Points', source: 'TechCrunch', category: 'Policy', views: '1.8M', timestamp: '4h', url: 'https://techcrunch.com' },
-    { id: '3', title: 'NVIDIA CEO Reveals Roadmap for Next-Gen AI Chips', source: 'Reuters', category: 'Industry', views: '1.5M', timestamp: '6h', url: 'https://reuters.com' },
-    { id: '4', title: 'Midjourney V7: Stunning New Features and Capabilities', source: 'Wired', category: 'Apps', views: '1.2M', timestamp: '8h', url: 'https://wired.com' },
-    { id: '5', title: 'Google DeepMind AlphaFold 3: Drug Discovery Revolution', source: 'MIT Tech', category: 'Industry', views: '980K', timestamp: '10h', url: 'https://technologyreview.com' },
-    { id: '6', title: 'Claude 3.5 vs GPT-4: The Ultimate Comparison', source: 'Ars Tech', category: 'Apps', views: '876K', timestamp: '12h', url: 'https://arstechnica.com' },
-    { id: '7', title: 'China\'s New AI Regulations: What Companies Need', source: 'Bloomberg', category: 'Policy', views: '754K', timestamp: 'Yesterday', url: 'https://bloomberg.com' },
-    { id: '8', title: 'Apple Silicon M4 Chip: AI Performance Breakthrough', source: 'The Verge', category: 'Industry', views: '689K', timestamp: 'Yesterday', url: 'https://www.theverge.com' },
-    { id: '9', title: 'Runway Gen-3 Alpha: Text-to-Video Revolution', source: 'TechCrunch', category: 'Apps', views: '612K', timestamp: '2d', url: 'https://techcrunch.com' },
-    { id: '10', title: 'Meta LLaMA 4 Leaks: Performance Benchmarks', source: 'Wired', category: 'Industry', views: '567K', timestamp: '2d', url: 'https://wired.com' },
-    { id: '11', title: 'Tesla Optimus: New Demo Shows Humanoid Progress', source: 'Reuters', category: 'Industry', views: '523K', timestamp: '2d', url: 'https://reuters.com' },
-    { id: '12', title: 'AI in Healthcare: FDA Approvals Hit Record High', source: 'MIT News', category: 'Apps', views: '498K', timestamp: '3d', url: 'https://news.mit.edu' },
+    { id: '1', title: 'OpenAI GPT-5 Rumors: What We Know About the Next Generation', source: 'THE VERGE', category: 'Industry', views: '2.3K', timestamp: '2h', url: 'https://www.theverge.com' },
+    { id: '2', title: 'EU Parliament Passes Comprehensive AI Act: Key Points', source: 'TECHCRUNCH', category: 'Policy', views: '1.8K', timestamp: '4h', url: 'https://techcrunch.com' },
+    { id: '3', title: 'NVIDIA CEO Reveals Roadmap for Next-Gen AI Chips', source: 'REUTERS', category: 'Industry', views: '1.5K', timestamp: '6h', url: 'https://reuters.com' },
+    { id: '4', title: 'Midjourney V7: Stunning New Features and Capabilities', source: 'WIRED', category: 'Apps', views: '1.2K', timestamp: '8h', url: 'https://wired.com' },
+    { id: '5', title: 'Google DeepMind AlphaFold 3: Drug Discovery Revolution', source: 'MIT TECH', category: 'Industry', views: '980', timestamp: '10h', url: 'https://technologyreview.com' },
+    { id: '6', title: 'Claude 3.5 vs GPT-4: The Ultimate Comparison', source: 'ARS TECH', category: 'Apps', views: '876', timestamp: '12h', url: 'https://arstechnica.com' },
+    { id: '7', title: 'China\'s New AI Regulations: What Companies Need', source: 'BLOOMBERG', category: 'Policy', views: '754', timestamp: 'Yesterday', url: 'https://bloomberg.com' },
+    { id: '8', title: 'Apple Silicon M4 Chip: AI Performance Breakthrough', source: 'THE VERGE', category: 'Industry', views: '689', timestamp: 'Yesterday', url: 'https://www.theverge.com' },
+    { id: '9', title: 'Runway Gen-3 Alpha: Text-to-Video Revolution', source: 'TECHCRUNCH', category: 'Apps', views: '612', timestamp: '2d', url: 'https://techcrunch.com' },
+    { id: '10', title: 'Meta LLaMA 4 Leaks: Performance Benchmarks', source: 'WIRED', category: 'Industry', views: '567', timestamp: '2d', url: 'https://wired.com' },
+    { id: '11', title: 'Tesla Optimus: New Demo Shows Humanoid Progress', source: 'REUTERS', category: 'Industry', views: '523', timestamp: '2d', url: 'https://reuters.com' },
+    { id: '12', title: 'AI in Healthcare: FDA Approvals Hit Record High', source: 'MIT NEWS', category: 'Apps', views: '498', timestamp: '3d', url: 'https://news.mit.edu' },
   ]
 }
 
 export async function GET() {
   try {
-    const popularNews = await fetchPopularNews()
+    const popularNews = await fetchHackerNews()
     return NextResponse.json(popularNews)
   } catch (error) {
     console.error('Popular news error:', error)
