@@ -1,3 +1,5 @@
+'use client'
+
 import NewsList from '@/components/NewsList'
 import Header from '@/components/Header'
 import { Suspense } from 'react'
@@ -7,8 +9,6 @@ import MatrixRain from '@/components/effects/MatrixRain'
 import ParticleGrid from '@/components/effects/ParticleGrid'
 import { GlitchText, CyberButton, NeonCard, DataCounter } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
-
-export const revalidate = 3600
 
 export default function Home() {
   const { t } = useLanguage()
