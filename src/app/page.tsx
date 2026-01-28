@@ -21,7 +21,20 @@ export default function Home() {
       setShowBackToTop(window.scrollY > 500)
     }
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    // 键盘快捷键
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Home' || (e.key === 'g' && e.ctrlKey)) {
+        e.preventDefault()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [])
 
   const scrollToTop = () => {
@@ -109,18 +122,30 @@ export default function Home() {
       
       {/* Back to Top Button */}
       <motion.button
-        className="fixed bottom-8 right-8 z-40 p-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+        className="fixed bottom-8 right-8 z-40 group"
         initial={{ opacity: 0, scale: 0 }}
-        animate={{ 
+        animate={{
           opacity: showBackToTop ? 1 : 0,
           scale: showBackToTop ? 1 : 0,
         }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={scrollToTop}
         style={{ pointerEvents: showBackToTop ? 'auto' : 'none' }}
       >
-        <ArrowUp className="w-5 h-5" />
+        <div className="relative">
+          {/* Glow effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
+          {/* Button */}
+          <div className="relative flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/40">
+            <ArrowUp className="w-5 h-5" />
+            <span className="text-sm font-medium pr-1">TOP</span>
+          </div>
+        </div>
+        {/* Tooltip */}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          按 G 键或 Home 键
+        </div>
       </motion.button>
       
       {/* Footer */}
