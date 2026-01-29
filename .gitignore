@@ -36,3 +36,16 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and AI Assistant Configurations
+.agent
+.agents
+.claude
+.codex
+.cursor
+.gemini
+.github
+.idea
+.trae
+.windsurf
+skills
