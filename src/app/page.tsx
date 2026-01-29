@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, memo } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp } from 'lucide-react'
+import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp, Rss } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import { GlitchText, CyberButton, NeonCard, DataCounter } from '@/components/effects/CyberComponents'
@@ -170,6 +170,16 @@ export default function Home() {
               <span>{t('deployedOn')}</span>
               <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
               <span>{t('dataSource')}</span>
+              <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
+              <a
+                href="/api/rss"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-orange-400 hover:text-orange-300 transition-colors"
+              >
+                <Rss className="w-3.5 h-3.5" />
+                <span>RSS</span>
+              </a>
             </div>
           </NeonCard>
           <p className="text-center text-xs text-slate-600 mt-6 px-4">
