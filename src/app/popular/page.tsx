@@ -1,21 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
-import { 
-  TrendingUp, 
-  Sparkles, 
-  Zap, 
+import {
+  TrendingUp,
+  Sparkles,
+  Zap,
   Flame,
   ArrowUp,
   RefreshCw
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
-import Starfield from '@/components/effects/Starfield'
-import MatrixRain from '@/components/effects/MatrixRain'
-import ParticleGrid from '@/components/effects/ParticleGrid'
 import { GlitchText, CyberButton } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
+
+// Dynamic imports for heavy visual effect components (bundle-dynamic-imports rule)
+const Starfield = dynamic(() => import('@/components/effects/Starfield'), { ssr: false })
+const MatrixRain = dynamic(() => import('@/components/effects/MatrixRain'), { ssr: false })
+const ParticleGrid = dynamic(() => import('@/components/effects/ParticleGrid'), { ssr: false })
 
 interface PopularItem {
   id: string
@@ -207,10 +210,10 @@ export default function PopularPage() {
   )
 }
 
-function PopularCard({ item, index }: { item: PopularItem; index: number }) {
+const PopularCard = memo(function PopularCard({ item, index }: { item: PopularItem; index: number }) {
   const [isHovered, setIsHovered] = useState(false)
   const style = categoryStyles[item.category] || categoryStyles.Industry
-  
+
   return (
     <motion.a
       href={item.url}
@@ -264,4 +267,4 @@ function PopularCard({ item, index }: { item: PopularItem; index: number }) {
       </div>
     </motion.a>
   )
-}
+})

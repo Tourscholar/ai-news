@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import NewsList from '@/components/NewsList'
-import Header from '@/components/Header'
-import { Suspense } from 'react'
+import { useState, useEffect, Suspense, memo } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp } from 'lucide-react'
-import Starfield from '@/components/effects/Starfield'
-import MatrixRain from '@/components/effects/MatrixRain'
-import ParticleGrid from '@/components/effects/ParticleGrid'
+import dynamic from 'next/dynamic'
+import Header from '@/components/Header'
 import { GlitchText, CyberButton, NeonCard, DataCounter } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
+
+// Dynamic imports for heavy visual effect components (bundle-dynamic-imports rule)
+const Starfield = dynamic(() => import('@/components/effects/Starfield'), { ssr: false })
+const MatrixRain = dynamic(() => import('@/components/effects/MatrixRain'), { ssr: false })
+const ParticleGrid = dynamic(() => import('@/components/effects/ParticleGrid'), { ssr: false })
+const NewsList = dynamic(() => import('@/components/NewsList'), { ssr: false })
 
 export default function Home() {
   const { t } = useLanguage()
@@ -179,9 +181,9 @@ export default function Home() {
   )
 }
 
-function NewsSkeleton() {
+const NewsSkeleton = memo(function NewsSkeleton() {
   const { t } = useLanguage()
-  
+
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in">
       {/* Categories Skeleton */}
@@ -212,4 +214,4 @@ function NewsSkeleton() {
       </div>
     </div>
   )
-}
+})

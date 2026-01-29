@@ -1,14 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import { Github, Star, GitFork, Clock, RefreshCw, ExternalLink, ArrowUp } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
-import Starfield from '@/components/effects/Starfield'
-import MatrixRain from '@/components/effects/MatrixRain'
-import ParticleGrid from '@/components/effects/ParticleGrid'
 import { GlitchText, NeonCard, CyberButton } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
+
+// Dynamic imports for heavy visual effect components (bundle-dynamic-imports rule)
+const Starfield = dynamic(() => import('@/components/effects/Starfield'), { ssr: false })
+const MatrixRain = dynamic(() => import('@/components/effects/MatrixRain'), { ssr: false })
+const ParticleGrid = dynamic(() => import('@/components/effects/ParticleGrid'), { ssr: false })
 
 interface GitHubRepo {
   id: number
@@ -265,10 +268,10 @@ export default function GitHubPage() {
   )
 }
 
-function RepoCard({ repo, index }: { repo: GitHubRepo; index: number }) {
+const RepoCard = memo(function RepoCard({ repo, index }: { repo: GitHubRepo; index: number }) {
   const [isHovered, setIsHovered] = useState(false)
   const langColor = languageColors[repo.language] || 'bg-gray-500'
-  
+
   return (
     <motion.a
       href={repo.url}
@@ -339,4 +342,4 @@ function RepoCard({ repo, index }: { repo: GitHubRepo; index: number }) {
       </NeonCard>
     </motion.a>
   )
-}
+})

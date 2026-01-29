@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Sparkles, Zap } from 'lucide-react'
@@ -22,14 +22,12 @@ export default function Header() {
     { key: 'navGithub', href: '/github' },
   ]
 
-  const getActiveIndex = () => {
+  const activeIndex = useMemo(() => {
     if (pathname === '/') return 0
     if (pathname === '/popular') return 1
     if (pathname === '/github') return 2
     return 0
-  }
-
-  const activeIndex = getActiveIndex()
+  }, [pathname])
 
   return (
     <motion.header
