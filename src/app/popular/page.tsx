@@ -156,7 +156,7 @@ export default function PopularPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-slate-900/60 backdrop-blur-xl rounded-2xl p-5 border border-slate-800/60 h-40 animate-pulse" />
+              <div key={i} className="bg-slate-900/60 backdrop-blur-xl rounded-2xl p-5 border border-slate-800/60 h-[160px] animate-pulse" />
             ))}
           </div>
         ) : (
@@ -222,9 +222,9 @@ function PopularCard({ item, index }: { item: PopularItem; index: number }) {
       whileHover={{ y: -3 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group block"
+      className="group block h-[160px]"
     >
-      <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-2xl p-5 border border-slate-800/60 hover:border-slate-700 transition-all duration-300 overflow-hidden">
+      <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-2xl p-5 border border-slate-800/60 hover:border-slate-700 transition-all duration-300 overflow-hidden h-full">
         
         {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />

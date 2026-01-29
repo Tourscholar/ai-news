@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Github, Star, GitFork, Clock, RefreshCw, ExternalLink } from 'lucide-react'
+import { motion, useScroll, useSpring } from 'framer-motion'
+import { Github, Star, GitFork, Clock, RefreshCw, ExternalLink, ArrowUp } from 'lucide-react'
 import Header from '@/components/Header'
 import Starfield from '@/components/effects/Starfield'
 import MatrixRain from '@/components/effects/MatrixRain'
@@ -91,6 +91,31 @@ export default function GitHubPage() {
   const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
+
+  // Handle scroll for back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400)
+    }
+    window.addEventListener('scroll', handleScroll)
+    
+    // Keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Home' || (e.key === 'g' && e.ctrlKey)) {
+        e.preventDefault()
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   const loadRepos = async () => {
     setLoading(true)
@@ -187,15 +212,7 @@ export default function GitHubPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="glass-card rounded-xl p-5 animate-pulse">
-                <div className="h-4 w-20 bg-slate-700/50 rounded mb-3" />
-                <div className="h-5 w-3/4 bg-slate-700/50 rounded mb-2" />
-                <div className="h-4 w-full bg-slate-700/50 rounded mb-4" />
-                <div className="flex gap-3">
-                  <div className="h-4 w-16 bg-slate-700/50 rounded" />
-                  <div className="h-4 w-16 bg-slate-700/50 rounded" />
-                </div>
-              </div>
+              <div key={i} className="glass-card rounded-xl p-5 animate-pulse h-[180px]" />
             ))}
           </div>
         ) : (
@@ -206,6 +223,31 @@ export default function GitHubPage() {
           </div>
         )}
       </main>
+      
+      {/* Back to Top */}
+      <motion.button
+        className="fixed bottom-8 right-8 z-40 group"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: showBackToTop ? 1 : 0, scale: showBackToTop ? 1 : 0 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        style={{ pointerEvents: showBackToTop ? 'auto' : 'none' }}
+      >
+        <div className="relative">
+          {/* Glow effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
+          {/* Button */}
+          <div className="relative flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/40">
+            <ArrowUp className="w-5 h-5" />
+            <span className="text-sm font-medium pr-1">TOP</span>
+          </div>
+        </div>
+        {/* Tooltip */}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          按 G 键或 Home 键
+        </div>
+      </motion.button>
       
       {/* Footer */}
       <footer className="border-t border-slate-800 py-8 mt-12 relative z-10">
@@ -238,7 +280,7 @@ function RepoCard({ repo, index }: { repo: GitHubRepo; index: number }) {
       whileHover={{ y: -4, scale: 1.01 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group block"
+      className="group block h-[180px]"
     >
       <NeonCard glowColor="purple" className="p-5 relative overflow-hidden h-full">
         {/* Rank */}
