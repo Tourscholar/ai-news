@@ -49,11 +49,7 @@ cp .env.example .env.local
 4. 复制 Client ID 和 Client Secret 到 `.env.local`
 
 ### Vercel 部署
-部署时在 Vercel Dashboard 的 Environment Variables 中添加：
-- `NEXTAUTH_URL`: `https://ai-news-bice.vercel.app`
-- `NEXTAUTH_SECRET`: `6P38//CztY61tS57cz5H7MwrUvBiMFQ9SwD3MrOK3kY=`
-- `GITHUB_ID`: `Ov23li5L1BQzlLMNTYkR`
-- `GITHUB_SECRET`: `9e43c4fce8d4d49d7483ac4c2e9c98324f1a7cc9`
+部署时在 Vercel Dashboard 的 Environment Variables 中添加以下变量
 
 ## 新闻源
 
