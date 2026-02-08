@@ -186,6 +186,17 @@ export default function Header() {
                       {t(item.key)}
                     </motion.a>
                   ))}
+                  <motion.a
+                    href="/subscribe"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 mt-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Zap className="w-4 h-4" />
+                    {t('subscribe')}
+                  </motion.a>
                 </nav>
               </motion.div>
             </motion.div>

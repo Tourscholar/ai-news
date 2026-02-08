@@ -294,31 +294,11 @@ export default function SubscribePage() {
           </div>
         </motion.div>
 
-        {/* Features Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-16 grid md:grid-cols-3 gap-6"
-        >
-          {[
-            { icon: '🚀', title: locale === 'zh' ? '实时更新' : 'Real-time', desc: locale === 'zh' ? '每小时自动更新' : 'Hourly updates' },
-            { icon: '🎯', title: locale === 'zh' ? '智能筛选' : 'Smart Filter', desc: locale === 'zh' ? 'AI 驱动的个性化推荐' : 'AI-powered picks' },
-            { icon: '🔒', title: locale === 'zh' ? '隐私优先' : 'Privacy First', desc: locale === 'zh' ? '不收集个人数据' : 'No data collection' },
-          ].map((item, index) => (
-            <div key={index} className="p-6 rounded-xl bg-slate-900/30 border border-slate-700/30 text-center">
-              <div className="text-4xl mb-3">{item.icon}</div>
-              <h4 className="text-lg font-bold text-white mb-1">{item.title}</h4>
-              <p className="text-sm text-slate-400">{item.desc}</p>
-            </div>
-          ))}
-        </motion.div>
-
         {/* Footer */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.6 }}
           className="mt-16 text-center"
         >
           <p className="text-slate-500 text-sm">
