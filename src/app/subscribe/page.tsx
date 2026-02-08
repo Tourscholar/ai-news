@@ -122,7 +122,12 @@ export default function SubscribePage() {
                 className="flex-1 px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-500 transition-all"
                 required
               />
-              <CyberButton type="submit" className="px-6 py-3">
+              <motion.button
+                type="submit"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl font-medium shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 {subscribed ? (
                   <>
                     <Check className="w-5 h-5" />
@@ -134,7 +139,7 @@ export default function SubscribePage() {
                     <span>订阅</span>
                   </>
                 )}
-              </CyberButton>
+              </motion.button>
             </form>
             
             {subscribed && (
@@ -173,7 +178,7 @@ export default function SubscribePage() {
                 transition={{ delay: 0.1 * index }}
               >
                 <NeonCard 
-                  glowColor={sub.enabled ? 'green' : 'indigo'} 
+                  glowColor={sub.enabled ? 'cyan' : 'indigo'} 
                   className="p-4 md:p-6"
                 >
                   <div className="flex items-center justify-between">
@@ -230,7 +235,7 @@ export default function SubscribePage() {
           transition={{ delay: 0.3 }}
           className="mt-12"
         >
-          <NeonCard glowColor="orange" className="p-6 md:p-8">
+          <NeonCard glowColor="pink" className="p-6 md:p-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
                 <Rss className="w-5 h-5 text-white" />
