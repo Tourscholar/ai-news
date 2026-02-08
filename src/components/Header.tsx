@@ -20,14 +20,12 @@ export default function Header() {
     { key: 'navLatest', href: '/' },
     { key: 'navPopular', href: '/popular' },
     { key: 'navGithub', href: '/github' },
-    { key: 'navSubscribe', href: '/subscribe' },
   ]
 
   const activeIndex = useMemo(() => {
     if (pathname === '/') return 0
     if (pathname === '/popular') return 1
     if (pathname === '/github') return 2
-    if (pathname === '/subscribe') return 3
     return 0
   }, [pathname])
 

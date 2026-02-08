@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession, signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
-import { Mail, Bell, Check, Rss, Zap, ExternalLink, ArrowRight } from 'lucide-react'
+import { Mail, Bell, Check, Rss, Zap, ExternalLink, ArrowRight, Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
-import { GlitchText, CyberButton } from '@/components/effects/CyberComponents'
+import { GlitchText } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
 
 const Starfield = dynamic(() => import('@/components/effects/Starfield'), { ssr: false })
@@ -21,6 +22,7 @@ interface Plan {
   features: string[]
   featuresEn: string[]
   popular?: boolean
+  paid?: boolean
 }
 
 const plans: Plan[] = [
@@ -42,6 +44,7 @@ const plans: Plan[] = [
     features: ['无限新闻订阅', 'AI 摘要生成', '实时推送', '自定义关键词'],
     featuresEn: ['Unlimited News', 'AI Summary', 'Real-time Push', 'Custom Keywords'],
     popular: true,
+    paid: true,
   },
   {
     id: 'team',
@@ -51,11 +54,13 @@ const plans: Plan[] = [
     priceEn: '$99/mo',
     features: ['多成员管理', 'API 权限', '技术支持', '数据导出'],
     featuresEn: ['Team Members', 'API Access', 'Priority Support', 'Data Export'],
+    paid: true,
   },
 ]
 
 export default function SubscribePage() {
-  const { t, locale } = useLanguage()
+  const { data: session } = useSession()
+  const { locale } = useLanguage()
   const [email, setEmail] = useState('')
   const [selectedPlan, setSelectedPlan] = useState('free')
   const [subscribed, setSubscribed] = useState(false)
@@ -86,6 +91,15 @@ export default function SubscribePage() {
   const selectBtn = locale === 'zh' ? '选择计划' : 'Select Plan'
   const selectedText = locale === 'zh' ? '已选择' : 'Selected'
   const subscribeSuccess = locale === 'zh' ? '订阅成功！请查收确认邮件' : 'Subscribed! Check your email.'
+  const loginRequired = locale === 'zh' ? '请先登录' : 'Please sign in first'
+  const loginToSubscribe = locale === 'zh' ? '登录后订阅' : 'Sign in to subscribe'
+
+  const handlePlanSelect = (plan: Plan) => {
+    if (plan.paid && !session) {
+      return
+    }
+    setSelectedPlan(plan.id)
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 relative overflow-hidden">
@@ -112,7 +126,7 @@ export default function SubscribePage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-6">
             <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-indigo-300">{t('subscribe')}</span>
+            <span className="text-sm text-indigo-300">{locale === 'zh' ? '订阅' : 'Subscribe'}</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
@@ -129,13 +143,22 @@ export default function SubscribePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
-              className={`relative p-8 rounded-2xl border transition-all cursor-pointer ${
+              className={`relative p-8 rounded-2xl border transition-all ${
                 selectedPlan === plan.id
                   ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
                   : 'bg-slate-900/50 border-slate-700/50 hover:border-slate-600'
-              }`}
-              onClick={() => setSelectedPlan(plan.id)}
+              } ${plan.paid && !session ? 'opacity-60' : ''}`}
+              onClick={() => handlePlanSelect(plan)}
             >
+              {plan.paid && !session && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-900/60 backdrop-blur-sm">
+                  <div className="text-center">
+                    <Lock className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
+                    <p className="text-indigo-300 font-medium">{loginRequired}</p>
+                  </div>
+                </div>
+              )}
+              
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium">
                   {popularBadge}
@@ -165,13 +188,18 @@ export default function SubscribePage() {
                   selectedPlan === plan.id
                     ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                } ${plan.paid && !session ? 'cursor-not-allowed' : ''}`}
+                whileHover={plan.paid && !session ? {} : { scale: 1.02 }}
+                whileTap={plan.paid && !session ? {} : { scale: 0.98 }}
+                disabled={plan.paid && !session}
               >
                 {selectedPlan === plan.id ? (
                   <span className="flex items-center justify-center gap-2">
                     <Check className="w-4 h-4" />{selectedText}
+                  </span>
+                ) : plan.paid && !session ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Lock className="w-4 h-4" />{loginToSubscribe}
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
@@ -216,7 +244,7 @@ export default function SubscribePage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Bell className="w-4 h-4" /><span>{t('subscribe')}</span>
+                <Bell className="w-4 h-4" /><span>{locale === 'zh' ? '订阅' : 'Subscribe'}</span>
               </motion.button>
             </form>
             
