@@ -33,22 +33,83 @@ const translations: Record<string, Record<string, string>> = {
     trendingNow: '🔥 正在热搜', popularTitle: '热门新闻', popularDesc: '探索最受关注的 AI 新闻和趋势',
     views: '次阅读',
     navGithub: 'GitHub 热榜', githubTrending: '🔥 今日热榜', githubTitle: 'GitHub Trending', githubDesc: '发现 GitHub 上最受欢迎的开源项目',
+    navSubscribe: '订阅计划',
     
-    // Subscribe Modal
-    subscribeTitle: '订阅',
-    subscribeDesc: '订阅你最关心的 AI 新闻',
-    emailPlaceholder: '输入你的邮箱...',
-    emailLabel: '邮箱地址',
-    subscribeSuccess: '订阅成功！请查收确认邮件',
-    subscribeCategories: '订阅分类',
-    rssFeed: 'RSS 订阅',
-    notificationSettings: '通知设置',
-    breakingNews: '重大新闻推送',
-    dailyDigest: '每日摘要',
-    trendChanges: '趋势变化提醒',
-    catIndustry: '行业动态',
-    catAIApps: 'AI 应用',
-    catTrending: '热门趋势',
+    // Subscribe Page
+    choosePlan: '选择你的订阅计划',
+    choosePlanEn: 'Choose Your Plan',
+    subscribeDesc: '获取最新的 AI 新闻资讯，个性化推荐，让信息主动找到你',
+    subscribeDescEn: 'Get the latest AI news and insights. Personalized recommendations that bring information to you.',
+    
+    // Pricing
+    freePlan: '免费版',
+    freePlanEn: 'Free',
+    proPlan: '专业版',
+    proPlanEn: 'Pro',
+    teamPlan: '团队版',
+    teamPlanEn: 'Team',
+    popular: '最受欢迎',
+    popularEn: 'Most Popular',
+    selectPlan: '选择计划',
+    selectPlanEn: 'Select Plan',
+    selected: '已选择',
+    selectedEn: 'Selected',
+    
+    // Features
+    daily精选: '每日精选 10 篇',
+    daily精选En: '10精选新闻/天',
+    basicFilter: '基础分类筛选',
+    basicFilterEn: '基础分类筛选',
+    rss订阅: 'RSS 订阅',
+    rss订阅En: 'RSS 订阅',
+    
+    // Pro Features
+    unlimitedNews: '无限新闻订阅',
+    unlimitedNewsEn: '无限新闻',
+    ai摘要: 'AI 摘要生成',
+    ai摘要En: 'AI 摘要',
+    realtimePush: '实时推送通知',
+    realtimePushEn: '实时推送',
+    customKeywords: '自定义关键词',
+    customKeywordsEn: '自定义关键词',
+    
+    // Team Features
+    teamMembers: '多成员管理',
+    teamMembersEn: '多成员',
+    apiAccess: 'API 访问权限',
+    apiAccessEn: 'API 权限',
+    support: '专属技术支持',
+    supportEn: '技术支持',
+    export: '数据导出',
+    exportEn: '数据导出',
+    
+    // Newsletter
+    emailNewsletter: '邮件简报',
+    emailNewsletterEn: 'Email Newsletter',
+    weeklyDigest: '每周精选 AI 新闻，直接发送到你的邮箱',
+    weeklyDigestEn: 'Weekly curated AI news, delivered directly to your inbox.',
+    enterEmail: '输入你的邮箱地址',
+    enterEmailEn: 'Enter your email address',
+    
+    // RSS
+    rssSubscribe: '使用 RSS 阅读器订阅',
+    rssSubscribeEn: 'Subscribe with your RSS reader',
+    copy: '复制',
+    copyEn: 'Copy',
+    
+    // Feature Cards
+    realtimeUpdates: '实时更新',
+    realtimeUpdatesEn: 'Real-time Updates',
+    autoUpdates: '每小时自动更新',
+    autoUpdatesEn: 'Auto-updates hourly',
+    smartFiltering: '智能筛选',
+    smartFilteringEn: 'Smart Filtering',
+    aiPowered: 'AI 驱动的个性化推荐',
+    aiPoweredEn: 'AI-powered recommendations',
+    privacyFirst: '隐私优先',
+    privacyFirstEn: 'Privacy First',
+    noData: '不收集个人数据',
+    noDataEn: 'No personal data collection',
   },
   en: {
     siteTitle: 'AI News', siteSubtitle: 'Daily',
@@ -73,22 +134,83 @@ const translations: Record<string, Record<string, string>> = {
     trendingNow: '🔥 Trending Now', popularTitle: 'Popular News', popularDesc: 'Explore the most talked about AI news and trends',
     views: 'views',
     navGithub: 'GitHub Trending', githubTrending: '🔥 Trending Today', githubTitle: 'GitHub Trending', githubDesc: 'Discover the most popular open source projects on GitHub',
+    navSubscribe: 'Subscriptions',
     
-    // Subscribe Modal
-    subscribeTitle: 'Subscribe',
-    subscribeDesc: 'Subscribe to AI news you care about',
-    emailPlaceholder: 'Enter your email...',
-    emailLabel: 'Email Address',
-    subscribeSuccess: 'Subscribed! Please check your confirmation email',
-    subscribeCategories: 'Subscription Categories',
-    rssFeed: 'RSS Feed',
-    notificationSettings: 'Notification Settings',
-    breakingNews: 'Breaking News Alerts',
-    dailyDigest: 'Daily Digest',
-    trendChanges: 'Trend Changes',
-    catIndustry: 'Industry News',
-    catAIApps: 'AI Applications',
-    catTrending: 'Trending',
+    // Subscribe Page
+    choosePlan: 'Choose Your Plan',
+    choosePlanEn: 'Choose Your Plan',
+    subscribeDesc: 'Get the latest AI news and insights. Personalized recommendations that bring information to you.',
+    subscribeDescEn: 'Get the latest AI news and insights. Personalized recommendations that bring information to you.',
+    
+    // Pricing
+    freePlan: 'Free',
+    freePlanEn: 'Free',
+    proPlan: 'Pro',
+    proPlanEn: 'Pro',
+    teamPlan: 'Team',
+    teamPlanEn: 'Team',
+    popular: 'Most Popular',
+    popularEn: 'Most Popular',
+    selectPlan: 'Select Plan',
+    selectPlanEn: 'Select Plan',
+    selected: 'Selected',
+    selectedEn: 'Selected',
+    
+    // Features
+    daily精选: '10精选新闻/天',
+    daily精选En: '10精选新闻/天',
+    basicFilter: 'Basic Category Filter',
+    basicFilterEn: 'Basic Category Filter',
+    rss订阅: 'RSS 订阅',
+    rss订阅En: 'RSS Subscription',
+    
+    // Pro Features
+    unlimitedNews: 'Unlimited News Subscription',
+    unlimitedNewsEn: 'Unlimited News',
+    ai摘要: 'AI Summary Generation',
+    ai摘要En: 'AI Summary',
+    realtimePush: 'Real-time Push Notifications',
+    realtimePushEn: 'Real-time Push',
+    customKeywords: 'Custom Keywords',
+    customKeywordsEn: 'Custom Keywords',
+    
+    // Team Features
+    teamMembers: 'Multi-member Management',
+    teamMembersEn: 'Multi-member',
+    apiAccess: 'API Access',
+    apiAccessEn: 'API Access',
+    support: 'Dedicated Support',
+    supportEn: 'Support',
+    export: 'Data Export',
+    exportEn: 'Data Export',
+    
+    // Newsletter
+    emailNewsletter: 'Email Newsletter',
+    emailNewsletterEn: 'Email Newsletter',
+    weeklyDigest: 'Weekly curated AI news, delivered directly to your inbox.',
+    weeklyDigestEn: 'Weekly curated AI news, delivered directly to your inbox.',
+    enterEmail: 'Enter your email address',
+    enterEmailEn: 'Enter your email address',
+    
+    // RSS
+    rssSubscribe: 'Subscribe with your RSS reader',
+    rssSubscribeEn: 'Subscribe with your RSS reader',
+    copy: 'Copy',
+    copyEn: 'Copy',
+    
+    // Feature Cards
+    realtimeUpdates: 'Real-time Updates',
+    realtimeUpdatesEn: 'Real-time Updates',
+    autoUpdates: 'Auto-updates hourly',
+    autoUpdatesEn: 'Auto-updates hourly',
+    smartFiltering: 'Smart Filtering',
+    smartFilteringEn: 'Smart Filtering',
+    aiPowered: 'AI-powered recommendations',
+    aiPoweredEn: 'AI-powered recommendations',
+    privacyFirst: 'Privacy First',
+    privacyFirstEn: 'Privacy First',
+    noData: 'No personal data collection',
+    noDataEn: 'No personal data collection',
   }
 }
 
