@@ -33,7 +33,22 @@ const translations: Record<string, Record<string, string>> = {
     trendingNow: '🔥 正在热搜', popularTitle: '热门新闻', popularDesc: '探索最受关注的 AI 新闻和趋势',
     views: '次阅读',
     navGithub: 'GitHub 热榜', githubTrending: '🔥 今日热榜', githubTitle: 'GitHub Trending', githubDesc: '发现 GitHub 上最受欢迎的开源项目',
-    navSubscribe: '订阅管理',
+    
+    // Subscribe Modal
+    subscribeTitle: '订阅',
+    subscribeDesc: '订阅你最关心的 AI 新闻',
+    emailPlaceholder: '输入你的邮箱...',
+    emailLabel: '邮箱地址',
+    subscribeSuccess: '订阅成功！请查收确认邮件',
+    subscribeCategories: '订阅分类',
+    rssFeed: 'RSS 订阅',
+    notificationSettings: '通知设置',
+    breakingNews: '重大新闻推送',
+    dailyDigest: '每日摘要',
+    trendChanges: '趋势变化提醒',
+    catIndustry: '行业动态',
+    catAIApps: 'AI 应用',
+    catTrending: '热门趋势',
   },
   en: {
     siteTitle: 'AI News', siteSubtitle: 'Daily',
@@ -58,7 +73,22 @@ const translations: Record<string, Record<string, string>> = {
     trendingNow: '🔥 Trending Now', popularTitle: 'Popular News', popularDesc: 'Explore the most talked about AI news and trends',
     views: 'views',
     navGithub: 'GitHub Trending', githubTrending: '🔥 Trending Today', githubTitle: 'GitHub Trending', githubDesc: 'Discover the most popular open source projects on GitHub',
-    navSubscribe: 'Subscriptions',
+    
+    // Subscribe Modal
+    subscribeTitle: 'Subscribe',
+    subscribeDesc: 'Subscribe to AI news you care about',
+    emailPlaceholder: 'Enter your email...',
+    emailLabel: 'Email Address',
+    subscribeSuccess: 'Subscribed! Please check your confirmation email',
+    subscribeCategories: 'Subscription Categories',
+    rssFeed: 'RSS Feed',
+    notificationSettings: 'Notification Settings',
+    breakingNews: 'Breaking News Alerts',
+    dailyDigest: 'Daily Digest',
+    trendChanges: 'Trend Changes',
+    catIndustry: 'Industry News',
+    catAIApps: 'AI Applications',
+    catTrending: 'Trending',
   }
 }
 
