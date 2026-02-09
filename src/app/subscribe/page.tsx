@@ -143,7 +143,7 @@ export default function SubscribePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
-              className={`relative p-8 rounded-2xl border transition-all ${
+              className={`relative p-8 rounded-2xl border transition-all overflow-hidden ${
                 selectedPlan === plan.id
                   ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
                   : 'bg-slate-900/50 border-slate-700/50 hover:border-slate-600'
@@ -151,11 +151,10 @@ export default function SubscribePage() {
               onClick={() => handlePlanSelect(plan)}
             >
               {plan.paid && !session && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-900/60 backdrop-blur-sm">
-                  <div className="text-center">
-                    <Lock className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
-                    <p className="text-indigo-300 font-medium">{loginRequired}</p>
-                  </div>
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-900/80 backdrop-blur-sm">
+                  <Lock className="w-10 h-10 text-indigo-400 mb-3" />
+                  <p className="text-indigo-300 font-medium">{loginRequired}</p>
+                  <p className="text-slate-400 text-sm mt-1">{locale === 'zh' ? '点击右上角登录' : 'Sign in from top right'}</p>
                 </div>
               )}
               
