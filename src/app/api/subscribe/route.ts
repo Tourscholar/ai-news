@@ -57,7 +57,11 @@ export async function POST(request: Request) {
     })
 
     if (data.error) {
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+      console.error('Resend error details:', JSON.stringify(data.error))
+      return NextResponse.json({ 
+        error: 'Resend failed', 
+        details: data.error.message || String(data.error) 
+      }, { status: 500 })
     }
 
     return NextResponse.json({ 
