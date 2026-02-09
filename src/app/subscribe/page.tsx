@@ -73,7 +73,7 @@ const plans: Plan[] = [
 
 // EmailJS 配置
 const EMAILJS_SERVICE_ID = 'service_24w3zl9'
-const EMAILJS_TEMPLATE_ID = 'template_6ioimfs'
+const EMAILJS_TEMPLATE_ID = 'template_cky1tr2'
 const EMAILJS_PUBLIC_KEY = 'y_xjvGQrjRdYtmtGz'
 
 export default function SubscribePage() {
