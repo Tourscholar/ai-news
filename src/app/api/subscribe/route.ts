@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import emailjs from '@emailjs/browser'
 
 export async function POST(request: Request) {
   try {
@@ -18,30 +17,49 @@ export async function POST(request: Request) {
     const realtime = isZh ? '24/7 实时更新' : '24/7 Real-time Updates'
     const readNow = isZh ? '立即阅读 →' : 'Read Now →'
 
-    // Send confirmation email
-    const data = await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID || 'service_24w3zl9',
-      process.env.EMAILJS_TEMPLATE_ID || 'template_6ioimfs',
-      {
-        to_email: email,
-        subject: title,
-        title,
-        greeting,
-        daily,
-        realtime,
-        read_now: readNow,
+    const serviceId = process.env.EMAILJS_SERVICE_ID || 'service_24w3zl9'
+    const templateId = process.env.EMAILJS_TEMPLATE_ID || 'template_6ioimfs'
+    const publicKey = process.env.EMAILJS_PUBLIC_KEY || 'y_xjvGQrjRdYtmtGz'
+
+    // Use EmailJS REST API directly
+    const response = await fetch(`https://api.emailjs.com/api/v1.0/email/${serviceId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      process.env.EMAILJS_PUBLIC_KEY || 'y_xjvGQrjRdYtmtGz'
-    )
+      body: JSON.stringify({
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        template_params: {
+          to_email: email,
+          subject: title,
+          title,
+          greeting,
+          daily,
+          realtime,
+          read_now: readNow,
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('EmailJS error:', errorText)
+      return NextResponse.json(
+        { error: 'Failed to send email' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
       message: isZh ? '订阅成功！请查收确认邮件' : 'Subscribed! Please check your email.',
     }, { status: 200 })
   } catch (error: any) {
-    console.error('EmailJS error:', error)
+    console.error('Newsletter error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to send email' },
+      { error: error.message || 'Failed to subscribe' },
       { status: 500 }
     )
   }
