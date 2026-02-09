@@ -21,8 +21,8 @@ export async function POST(request: Request) {
     const templateId = process.env.EMAILJS_TEMPLATE_ID || 'template_6ioimfs'
     const publicKey = process.env.EMAILJS_PUBLIC_KEY || 'y_xjvGQrjRdYtmtGz'
 
-    // Use EmailJS REST API directly
-    const response = await fetch(`https://api.emailjs.com/api/v1.0/email/${serviceId}`, {
+    // EmailJS REST API
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,11 +43,12 @@ export async function POST(request: Request) {
       }),
     })
 
+    const responseText = await response.text()
+    
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('EmailJS error:', errorText)
+      console.error('EmailJS error:', response.status, responseText)
       return NextResponse.json(
-        { error: 'Failed to send email' },
+        { error: `Email failed: ${responseText}` },
         { status: 500 }
       )
     }
