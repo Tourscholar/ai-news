@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const readNow = isZh ? '立即阅读 →' : 'Read Now →'
 
     const data = await resend.emails.send({
-      from: 'AI News Daily <newsletter@ai-news-bice.vercel.app>',
+      from: 'AI News Daily <onboarding@resend.dev>',
       to: email,
       subject: title,
       html: `
