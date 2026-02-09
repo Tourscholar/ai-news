@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { Mail, Bell, Check, Rss, Zap, ExternalLink, ArrowRight, Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -63,13 +63,40 @@ export default function SubscribePage() {
   const { locale } = useLanguage()
   const [email, setEmail] = useState('')
   const [selectedPlan, setSelectedPlan] = useState('free')
-  const [subscribed, setSubscribed] = useState(false)
+  const [subscribeState, setSubscribeState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [subscribeMessage, setSubscribeMessage] = useState('')
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setTimeout(() => setSubscribed(false), 3000)
+    if (!email) return
+
+    setSubscribeState('loading')
+    setSubscribeMessage('')
+
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setSubscribeState('success')
+        setSubscribeMessage(
+          locale === 'zh' 
+            ? `订阅成功！${email} 已加入邮件列表` 
+            : `Subscribed! ${email} added to newsletter`
+        )
+        setEmail('')
+      } else {
+        setSubscribeState('error')
+        setSubscribeMessage(data.error || (locale === 'zh' ? '订阅失败' : 'Failed to subscribe'))
+      }
+    } catch {
+      setSubscribeState('error')
+      setSubscribeMessage(locale === 'zh' ? '订阅失败，请重试' : 'Failed to subscribe, please try again')
     }
   }
 
@@ -90,14 +117,12 @@ export default function SubscribePage() {
   const popularBadge = locale === 'zh' ? '最受欢迎' : 'Most Popular'
   const selectBtn = locale === 'zh' ? '选择计划' : 'Select Plan'
   const selectedText = locale === 'zh' ? '已选择' : 'Selected'
-  const subscribeSuccess = locale === 'zh' ? '订阅成功！请查收确认邮件' : 'Subscribed! Check your email.'
   const loginRequired = locale === 'zh' ? '请先登录' : 'Please sign in first'
   const loginToSubscribe = locale === 'zh' ? '登录后订阅' : 'Sign in to subscribe'
+  const loadingText = locale === 'zh' ? '订阅中...' : 'Subscribing...'
 
   const handlePlanSelect = (plan: Plan) => {
-    if (plan.paid && !session) {
-      return
-    }
+    if (plan.paid && !session) return
     setSelectedPlan(plan.id)
   }
 
@@ -143,13 +168,14 @@ export default function SubscribePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
-              className={`relative rounded-2xl border transition-all overflow-hidden ${
+              className={`relative rounded-2xl border overflow-hidden ${
                 selectedPlan === plan.id
                   ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
                   : 'bg-slate-900/50 border-slate-700/50 hover:border-slate-600'
               } ${plan.paid && !session ? 'opacity-60' : ''}`}
               onClick={() => handlePlanSelect(plan)}
             >
+              {/* Overlay for paid plans */}
               {plan.paid && !session && (
                 <div className="absolute -inset-2 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-950/60 backdrop-blur-sm border border-slate-700/50">
                   <Lock className="w-12 h-12 text-indigo-400 mb-3" />
@@ -158,12 +184,14 @@ export default function SubscribePage() {
                 </div>
               )}
               
+              {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium z-10">
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium z-20">
                   {popularBadge}
                 </div>
               )}
               
+              {/* Card content */}
               <div className="p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold text-white mb-2">{planName(plan)}</h3>
@@ -212,7 +240,7 @@ export default function SubscribePage() {
           ))}
         </div>
 
-        {/* Email Subscribe */}
+        {/* Email Newsletter */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -238,24 +266,47 @@ export default function SubscribePage() {
                 placeholder={enterEmail}
                 className="flex-1 px-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-500 transition-all"
                 required
+                disabled={subscribeState === 'loading'}
               />
               <motion.button
                 type="submit"
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={subscribeState === 'loading'}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg disabled:opacity-50"
+                whileHover={subscribeState === 'loading' ? {} : { scale: 1.02 }}
+                whileTap={subscribeState === 'loading' ? {} : { scale: 0.98 }}
               >
-                <Bell className="w-4 h-4" /><span>{locale === 'zh' ? '订阅' : 'Subscribe'}</span>
+                {subscribeState === 'loading' ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>{loadingText}</span>
+                  </>
+                ) : (
+                  <>
+                    <Bell className="w-4 h-4" />
+                    <span>{locale === 'zh' ? '订阅' : 'Subscribe'}</span>
+                  </>
+                )}
               </motion.button>
             </form>
             
-            {subscribed && (
+            {subscribeState === 'success' && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-center flex items-center justify-center gap-2"
               >
-                <Check className="w-5 h-5" /><span>{subscribeSuccess}</span>
+                <Check className="w-5 h-5" />
+                <span>{subscribeMessage}</span>
+              </motion.div>
+            )}
+            
+            {subscribeState === 'error' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-center"
+              >
+                {subscribeMessage}
               </motion.div>
             )}
           </div>
@@ -289,7 +340,8 @@ export default function SubscribePage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigator.clipboard.writeText('https://ai-news-bice.vercel.app/api/rss')}
               >
-                <ExternalLink className="w-4 h-4" /><span>{copyText}</span>
+                <ExternalLink className="w-4 h-4" />
+                <span>{copyText}</span>
               </motion.button>
             </div>
           </div>
