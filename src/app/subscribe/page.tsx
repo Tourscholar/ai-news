@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import { GlitchText } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
-import emailjs from '@emailjs/browser'
 
 const Starfield = dynamic(() => import('@/components/effects/Starfield'), { ssr: false })
 const MatrixRain = dynamic(() => import('@/components/effects/MatrixRain'), { ssr: false })
@@ -71,10 +70,7 @@ const plans: Plan[] = [
   },
 ]
 
-// EmailJS 配置
-const EMAILJS_SERVICE_ID = 'service_4kb0w7a'
-const EMAILJS_TEMPLATE_ID = 'template_cky1tr2'
-const EMAILJS_PUBLIC_KEY = 'y_xjvGQrjRdYtmtGz'
+// Nodemailer API endpoint (configured in src/app/api/subscribe/route.ts)
 
 export default function SubscribePage() {
   const { data: session } = useSession()
@@ -92,41 +88,29 @@ export default function SubscribePage() {
     setSubscribeMessage('')
 
     try {
-      const isZh = locale === 'zh'
-      const title = isZh ? '🎉 订阅成功！' : '🎉 Subscription Confirmed!'
-      const greeting = isZh
-        ? `感谢订阅！<strong>${email}</strong> 已加入邮件列表。`
-        : `Thank you for subscribing! <strong>${email}</strong> added to newsletter.`
-      const daily = isZh ? '每日 50+ 篇新闻' : '50+ Daily News'
-      const realtime = isZh ? '24/7 实时更新' : '24/7 Real-time Updates'
-      const readNow = isZh ? '立即阅读 →' : 'Read Now →'
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, locale }),
+      })
 
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          to_email: email,
-          subject: title,
-          title,
-          greeting,
-          daily,
-          realtime,
-          read_now: readNow,
-        },
-        EMAILJS_PUBLIC_KEY
-      )
+      const data = await res.json()
 
-      setSubscribeState('success')
-      setSubscribeMessage(
-        isZh 
-          ? `订阅成功！${email} 已加入邮件列表` 
-          : `Subscribed! ${email} added to newsletter`
-      )
-      setEmail('')
-    } catch (error: any) {
-      console.error('EmailJS error:', error)
+      if (res.ok) {
+        setSubscribeState('success')
+        setSubscribeMessage(
+          locale === 'zh' 
+            ? `订阅成功！${email} 已加入邮件列表` 
+            : `Subscribed! ${email} added to newsletter`
+        )
+        setEmail('')
+      } else {
+        setSubscribeState('error')
+        setSubscribeMessage(data.error || (locale === 'zh' ? '订阅失败' : 'Failed to subscribe'))
+      }
+    } catch {
       setSubscribeState('error')
-      setSubscribeMessage(error.message || (locale === 'zh' ? '订阅失败，请重试' : 'Failed to subscribe'))
+      setSubscribeMessage(locale === 'zh' ? '订阅失败，请重试' : 'Failed to subscribe, please try again')
     }
   }
 
