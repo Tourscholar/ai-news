@@ -143,7 +143,7 @@ export default function SubscribePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
-              className={`relative p-8 rounded-2xl border transition-all overflow-hidden ${
+              className={`relative rounded-2xl border transition-all overflow-hidden ${
                 selectedPlan === plan.id
                   ? 'bg-indigo-500/10 border-indigo-500/50 shadow-lg shadow-indigo-500/20'
                   : 'bg-slate-900/50 border-slate-700/50 hover:border-slate-600'
@@ -151,61 +151,63 @@ export default function SubscribePage() {
               onClick={() => handlePlanSelect(plan)}
             >
               {plan.paid && !session && (
-                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-900/80 backdrop-blur-sm">
-                  <Lock className="w-10 h-10 text-indigo-400 mb-3" />
-                  <p className="text-indigo-300 font-medium">{loginRequired}</p>
-                  <p className="text-slate-400 text-sm mt-1">{locale === 'zh' ? '点击右上角登录' : 'Sign in from top right'}</p>
+                <div className="absolute -inset-2 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-900/95 backdrop-blur-sm border border-slate-700/50">
+                  <Lock className="w-12 h-12 text-indigo-400 mb-3" />
+                  <p className="text-indigo-300 font-medium text-lg">{loginRequired}</p>
+                  <p className="text-slate-400 text-sm mt-2">{locale === 'zh' ? '点击右上角登录' : 'Sign in from top right'}</p>
                 </div>
               )}
               
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium z-10">
                   {popularBadge}
                 </div>
               )}
               
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">{planName(plan)}</h3>
-                <div className="text-3xl font-bold text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
-                  {locale === 'zh' ? plan.price : plan.priceEn}
+              <div className="p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold text-white mb-2">{planName(plan)}</h3>
+                  <div className="text-3xl font-bold text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
+                    {locale === 'zh' ? plan.price : plan.priceEn}
+                  </div>
                 </div>
+                
+                <ul className="space-y-3 mb-8">
+                  {getPlanFeatures(plan).map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-slate-300">
+                      <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 text-green-400" />
+                      </div>
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <motion.button
+                  className={`w-full py-3 rounded-xl font-medium transition-all ${
+                    selectedPlan === plan.id
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  } ${plan.paid && !session ? 'cursor-not-allowed opacity-50' : ''}`}
+                  whileHover={plan.paid && !session ? {} : { scale: 1.02 }}
+                  whileTap={plan.paid && !session ? {} : { scale: 0.98 }}
+                  disabled={plan.paid && !session}
+                >
+                  {selectedPlan === plan.id ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Check className="w-4 h-4" />{selectedText}
+                    </span>
+                  ) : plan.paid && !session ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Lock className="w-4 h-4" />{loginToSubscribe}
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      {selectBtn}<ArrowRight className="w-4 h-4" />
+                    </span>
+                  )}
+                </motion.button>
               </div>
-              
-              <ul className="space-y-3 mb-8">
-                {getPlanFeatures(plan).map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-slate-300">
-                    <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <Check className="w-3 h-3 text-green-400" />
-                    </div>
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <motion.button
-                className={`w-full py-3 rounded-xl font-medium transition-all ${
-                  selectedPlan === plan.id
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                } ${plan.paid && !session ? 'cursor-not-allowed' : ''}`}
-                whileHover={plan.paid && !session ? {} : { scale: 1.02 }}
-                whileTap={plan.paid && !session ? {} : { scale: 0.98 }}
-                disabled={plan.paid && !session}
-              >
-                {selectedPlan === plan.id ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Check className="w-4 h-4" />{selectedText}
-                  </span>
-                ) : plan.paid && !session ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4" />{loginToSubscribe}
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    {selectBtn}<ArrowRight className="w-4 h-4" />
-                  </span>
-                )}
-              </motion.button>
             </motion.div>
           ))}
         </div>
