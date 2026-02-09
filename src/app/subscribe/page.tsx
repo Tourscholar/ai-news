@@ -151,7 +151,7 @@ export default function SubscribePage() {
               onClick={() => handlePlanSelect(plan)}
             >
               {plan.paid && !session && (
-                <div className="absolute -inset-2 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-950/85 backdrop-blur-sm border border-slate-700/50">
+                <div className="absolute -inset-2 z-50 flex flex-col items-center justify-center rounded-2xl bg-slate-950/60 backdrop-blur-sm border border-slate-700/50">
                   <Lock className="w-12 h-12 text-indigo-400 mb-3" />
                   <p className="text-indigo-300 font-medium text-lg">{loginRequired}</p>
                   <p className="text-slate-400 text-sm mt-2">{locale === 'zh' ? '点击右上角登录' : 'Sign in from top right'}</p>
