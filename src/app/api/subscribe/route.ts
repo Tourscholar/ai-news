@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
 export async function POST(request: Request) {
   try {
@@ -7,6 +7,20 @@ export async function POST(request: Request) {
 
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
+    }
+
+    const gmailEmail = process.env.GMAIL_EMAIL
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
+
+    // If no credentials, simulate success
+    if (!gmailEmail || !gmailAppPassword) {
+      console.log('Newsletter subscription (mock):', email, locale)
+      return NextResponse.json({
+        success: true,
+        message: locale === 'zh' ? '订阅成功！请查收确认邮件' : 'Subscribed! Please check your email.',
+        mock: true,
+        note: 'Configure GMAIL_EMAIL and GMAIL_APP_PASSWORD in Vercel'
+      }, { status: 200 })
     }
 
     const isZh = locale === 'zh'
@@ -18,11 +32,19 @@ export async function POST(request: Request) {
     const realtime = isZh ? '24/7 实时更新' : '24/7 Real-time Updates'
     const readNow = isZh ? '立即阅读 →' : 'Read Now →'
 
-    const resend = new Resend(process.env.RESEND_API_KEY)
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: gmailEmail,
+        pass: gmailAppPassword,
+      },
+    })
 
-    const data = await resend.emails.send({
-      from: 'AI News Daily <newsletter@resend.dev>',
-      to: [email],
+    // Send email
+    await transporter.sendMail({
+      from: `"AI News Daily" <${gmailEmail}>`,
+      to: email,
       subject: title,
       html: `
         <!DOCTYPE html>
@@ -77,14 +99,6 @@ export async function POST(request: Request) {
       `,
     })
 
-    if (data.error) {
-      console.error('Resend error:', data.error)
-      return NextResponse.json(
-        { error: data.error.message || 'Failed to send email' },
-        { status: 500 }
-      )
-    }
-
     return NextResponse.json({
       success: true,
       message: isZh ? '订阅成功！请查收确认邮件' : 'Subscribed! Please check your email.',
@@ -92,7 +106,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Newsletter error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to subscribe' },
+      { error: error.message || 'Failed to send email' },
       { status: 500 }
     )
   }
