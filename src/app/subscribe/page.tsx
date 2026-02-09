@@ -129,11 +129,11 @@ export default function SubscribePage() {
   const copyText = locale === 'zh' ? '复制' : 'Copy'
   const popularBadge = locale === 'zh' ? '🔥 最受欢迎' : '🔥 Most Popular'
   const selectBtn = locale === 'zh' ? '选择计划' : 'Select Plan'
-  const selectedText = locale === 'zh' ? '✓ 已选择' : '✓ Selected'
+  const selectedText = locale === 'zh' ? '已选择' : 'Selected'
   const loginRequired = locale === 'zh' ? '请先登录' : 'Please sign in first'
   const loginToSubscribe = locale === 'zh' ? '登录后订阅' : 'Sign in to subscribe'
   const loadingText = locale === 'zh' ? '订阅中...' : 'Subscribing...'
-  const yearlySave = locale === 'zh' ? '年付省 20%' : 'Save 20% with yearly'
+  const yearlySave = locale === 'zh' ? '年付省 20%' : 'Save 20%'
 
   const handlePlanSelect = (plan: Plan) => {
     if (plan.paid && !session) return
@@ -162,7 +162,7 @@ export default function SubscribePage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -171,14 +171,14 @@ export default function SubscribePage() {
             className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-8"
           >
             <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
-            <span className="text-sm font-medium text-indigo-300 tracking-wider">{locale === 'zh' ? '订阅计划' : 'SUBSCRIPTION PLANS'}</span>
+            <span className="text-sm font-medium text-indigo-300 tracking-wider">{locale === 'zh' ? '订阅计划' : 'SUBSCRIPTION'}</span>
           </motion.div>
           
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-5xl md:text-7xl font-bold mb-6"
+            className="text-5xl md:text-6xl font-bold mb-4"
           >
             <GlitchText text={locale === 'zh' ? '选择你的计划' : 'Choose Your Plan'} className="text-white" />
           </motion.h1>
@@ -187,180 +187,161 @@ export default function SubscribePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg text-slate-400 max-w-xl mx-auto"
           >
             {subscribeDesc}
           </motion.p>
         </motion.div>
 
-        {/* Pricing Cards - Cyberpunk Style */}
-        <div className="grid md:grid-cols-3 gap-8 mb-20">
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 * (index + 1), duration: 0.5 }}
-              className={`relative group ${selectedPlan === plan.id ? 'scale-105' : ''}`}
+              className={`relative ${selectedPlan === plan.id ? 'scale-105 z-10' : ''}`}
               onClick={() => handlePlanSelect(plan)}
             >
-              {/* Popular Badge - Floating Above */}
+              {/* Popular Badge */}
               {plan.popular && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="absolute -top-5 left-1/2 -translate-x-1/2 z-30"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 z-20"
                 >
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-lg opacity-75 animate-pulse" />
-                    <div className="relative px-6 py-2 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white text-sm font-bold tracking-wider shadow-lg">
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-md opacity-75" />
+                    <div className="relative px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white text-xs font-bold tracking-wider">
                       {popularBadge}
                     </div>
                   </div>
                 </motion.div>
               )}
               
-              {/* Card Glow Effect */}
-              <div className={`absolute -inset-0.5 rounded-3xl bg-gradient-to-r ${plan.gradient} opacity-0 group-hover:opacity-50 blur-xl transition-all duration-500 ${selectedPlan === plan.id ? 'opacity-75' : ''}`} />
+              {/* Card Glow */}
+              <div className={`absolute -inset-0.5 rounded-2xl bg-gradient-to-r ${plan.gradient} opacity-0 transition-all duration-300 ${
+                selectedPlan === plan.id ? 'opacity-100' : 'group-hover:opacity-30'
+              } blur-md`} />
               
               {/* Main Card */}
-              <div className={`relative h-full rounded-3xl overflow-hidden transition-all duration-300 ${
+              <div className={`relative h-full rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer ${
                 selectedPlan === plan.id
                   ? 'bg-slate-900/90 border-2 border-indigo-500/50 shadow-2xl shadow-indigo-500/20'
-                  : 'bg-slate-900/60 border border-slate-700/50 hover:border-slate-600'
-              } ${plan.paid && !session ? 'opacity-70' : ''}`}>
+                  : 'bg-slate-900/50 border border-slate-700/50 hover:border-slate-600 hover:bg-slate-900/70'
+              } ${plan.paid && !session ? 'opacity-60' : ''}`}>
                 
                 {/* Overlay for paid plans */}
                 {plan.paid && !session && (
-                  <div className="absolute inset-0 z-20 bg-slate-950/70 backdrop-blur-md flex flex-col items-center justify-center">
+                  <div className="absolute inset-0 z-10 bg-slate-950/60 backdrop-blur-sm flex flex-col items-center justify-center">
                     <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
+                      initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       className="text-center"
                     >
-                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-slate-800/80 border border-indigo-500/30 flex items-center justify-center">
-                        <Lock className="w-10 h-10 text-indigo-400" />
+                      <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-slate-800/80 border border-indigo-500/30 flex items-center justify-center">
+                        <Lock className="w-8 h-8 text-indigo-400" />
                       </div>
-                      <p className="text-indigo-300 font-bold text-xl mb-2">{loginRequired}</p>
-                      <p className="text-slate-500 text-sm">{locale === 'zh' ? '登录后解锁更多功能' : 'Sign in to unlock'}</p>
+                      <p className="text-indigo-300 font-bold">{loginRequired}</p>
                     </motion.div>
                   </div>
                 )}
                 
-                {/* Card Pattern */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_25%,transparent_50%,rgba(255,255,255,.1)_50%,transparent_75%,rgba(255,255,255,.1)_75%)] bg-[length:8px_8px]" />
-                </div>
-                
-                {/* Card Content */}
-                <div className="relative p-8 pt-12">
-                  {/* Plan Icon */}
+                {/* Selected Indicator */}
+                {selectedPlan === plan.id && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 * (index + 1) }}
-                    className={`w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center shadow-lg ${
+                    className="absolute top-4 right-4 z-10"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  </motion.div>
+                )}
+                
+                {/* Card Content */}
+                <div className="relative p-6 pt-10">
+                  {/* Icon */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 * (index + 1) }}
+                    className={`w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center shadow-lg ${
                       selectedPlan === plan.id ? 'shadow-indigo-500/30' : ''
                     }`}
                   >
                     {plan.popular ? (
-                      <Sparkles className="w-8 h-8 text-white" />
+                      <Sparkles className="w-7 h-7 text-white" />
                     ) : (
-                      <Zap className="w-8 h-8 text-white" />
+                      <Zap className="w-7 h-7 text-white" />
                     )}
                   </motion.div>
                   
-                  {/* Plan Name */}
-                  <h3 className={`text-2xl font-bold text-center mb-2 ${
+                  {/* Name */}
+                  <h3 className={`text-xl font-bold text-center mb-1 ${
                     selectedPlan === plan.id ? 'text-white' : 'text-slate-200'
                   }`}>
                     {planName(plan)}
                   </h3>
                   
                   {/* Price */}
-                  <div className="text-center mb-8">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-5xl font-bold text-transparent bg-gradient-to-r from-white to-slate-300 bg-clip-text">
+                  <div className="text-center mb-4">
+                    <div className="flex items-baseline justify-center gap-0.5">
+                      <span className="text-4xl font-bold text-transparent bg-gradient-to-r from-white to-slate-300 bg-clip-text">
                         {plan.price}
                       </span>
                       {plan.id !== 'free' && (
-                        <span className="text-slate-500 text-lg">/{locale === 'zh' ? '月' : 'mo'}</span>
+                        <span className="text-slate-500 text-sm">/{locale === 'zh' ? '月' : 'mo'}</span>
                       )}
                     </div>
                     {plan.id !== 'free' && (
-                      <p className="text-sm text-slate-500 mt-1">{yearlySave}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{yearlySave}</p>
                     )}
                   </div>
                   
                   {/* Divider */}
-                  <div className="relative h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-6">
-                    {selectedPlan === plan.id && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500" />
-                    )}
-                  </div>
+                  <div className={`h-px mb-4 ${
+                    selectedPlan === plan.id ? 'bg-gradient-to-r from-indigo-500/50 to-purple-500/50' : 'bg-slate-700/50'
+                  }`} />
                   
                   {/* Features */}
-                  <ul className="space-y-4 mb-8">
+                  <ul className="space-y-2.5 mb-6">
                     {getPlanFeatures(plan).map((feature, i) => (
                       <motion.li
                         key={i}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 * (index + 1) + 0.1 * i }}
-                        className="flex items-center gap-3"
+                        transition={{ delay: 0.3 * (index + 1) + 0.05 * i }}
+                        className="flex items-center gap-2 text-sm"
                       >
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                          selectedPlan === plan.id
-                            ? 'bg-indigo-500/20 border border-indigo-500/30'
-                            : 'bg-slate-800'
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                          selectedPlan === plan.id ? 'bg-indigo-500/20' : 'bg-slate-800'
                         }`}>
-                          <Check className={`w-3.5 h-3.5 ${selectedPlan === plan.id ? 'text-indigo-400' : 'text-slate-500'}`} />
+                          <Check className={`w-2.5 h-2.5 ${selectedPlan === plan.id ? 'text-indigo-400' : 'text-slate-600'}`} />
                         </div>
-                        <span className={`text-sm ${selectedPlan === plan.id ? 'text-slate-200' : 'text-slate-400'}`}>
+                        <span className={selectedPlan === plan.id ? 'text-slate-200' : 'text-slate-400'}>
                           {feature}
                         </span>
                       </motion.li>
                     ))}
                   </ul>
                   
-                  {/* Select Button */}
+                  {/* Button */}
                   <motion.button
                     whileHover={plan.paid && !session ? {} : { scale: 1.02 }}
                     whileTap={plan.paid && !session ? {} : { scale: 0.98 }}
-                    className={`w-full py-4 rounded-xl font-bold text-sm tracking-wider transition-all ${
+                    className={`w-full py-3 rounded-lg font-bold text-sm tracking-wide transition-all ${
                       selectedPlan === plan.id
                         ? `bg-gradient-to-r ${plan.gradient} text-white shadow-lg`
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                     } ${plan.paid && !session ? 'cursor-not-allowed opacity-50' : ''}`}
                     disabled={plan.paid && !session}
                   >
-                    {selectedPlan === plan.id ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <Check className="w-4 h-4" />{selectedText}
-                      </span>
-                    ) : plan.paid && !session ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <Lock className="w-4 h-4" />{loginToSubscribe}
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        {selectBtn}<ArrowRight className="w-4 h-4" />
-                      </span>
-                    )}
+                    {selectedPlan === plan.id ? selectedText : loginToSubscribe}
                   </motion.button>
                 </div>
-                
-                {/* Selected Glow */}
-                {selectedPlan === plan.id && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="absolute inset-0 rounded-3xl pointer-events-none"
-                    style={{
-                      boxShadow: 'inset 0 0 30px rgba(99, 102, 241, 0.1)',
-                    }}
-                  />
-                )}
               </div>
             </motion.div>
           ))}
@@ -373,56 +354,52 @@ export default function SubscribePage() {
           transition={{ delay: 0.8 }}
           className="max-w-2xl mx-auto"
         >
-          <div className="relative rounded-3xl overflow-hidden">
-            {/* Glow */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30 blur-xl" />
-            
-            <div className="relative p-10 rounded-3xl bg-slate-900/80 border border-slate-700/50 backdrop-blur-xl">
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
-              
-              <div className="text-center mb-8">
+          <div className="relative rounded-2xl overflow-hidden">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-xl" />
+            <div className="relative p-8 rounded-2xl bg-slate-900/80 border border-slate-700/50 backdrop-blur-xl">
+              <div className="text-center mb-6">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30"
+                  className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30"
                 >
-                  <Mail className="w-10 h-10 text-white" />
+                  <Mail className="w-8 h-8 text-white" />
                 </motion.div>
-                <h2 className="text-3xl font-bold text-white mb-2">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   {locale === 'zh' ? '邮件简报' : 'Email Newsletter'}
                 </h2>
-                <p className="text-slate-400">{weeklyDigest}</p>
+                <p className="text-slate-400 text-sm">{weeklyDigest}</p>
               </div>
               
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={enterEmail}
-                  className="flex-1 px-6 py-4 rounded-xl bg-slate-800/50 border border-slate-600 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-500 transition-all"
+                  className="flex-1 px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-600 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-500 transition-all"
                   required
                   disabled={subscribeState === 'loading'}
                 />
                 <motion.button
                   type="submit"
                   disabled={subscribeState === 'loading'}
-                  className={`px-8 py-4 rounded-xl font-bold tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  className={`px-6 py-3 rounded-lg font-bold tracking-wide transition-all flex items-center justify-center gap-2 ${
                     subscribeState === 'loading'
                       ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30'
+                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
                   }`}
                   whileHover={subscribeState === 'loading' ? {} : { scale: 1.02 }}
                   whileTap={subscribeState === 'loading' ? {} : { scale: 0.98 }}
                 >
                   {subscribeState === 'loading' ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       <span>{loadingText}</span>
                     </>
                   ) : (
                     <>
-                      <Bell className="w-5 h-5" />
+                      <Bell className="w-4 h-4" />
                       <span>{locale === 'zh' ? '订阅' : 'Subscribe'}</span>
                     </>
                   )}
@@ -433,10 +410,10 @@ export default function SubscribePage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-center flex items-center justify-center gap-2"
+                  className="mt-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-center text-sm flex items-center justify-center gap-2"
                 >
-                  <Check className="w-5 h-5" />
-                  <span className="font-medium">{subscribeMessage}</span>
+                  <Check className="w-4 h-4" />
+                  <span>{subscribeMessage}</span>
                 </motion.div>
               )}
               
@@ -444,7 +421,7 @@ export default function SubscribePage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-center"
+                  className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-center text-sm"
                 >
                   {subscribeMessage}
                 </motion.div>
@@ -458,16 +435,16 @@ export default function SubscribePage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="mt-16 max-w-xl mx-auto"
+          className="mt-12 max-w-xl mx-auto"
         >
-          <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-700/30">
+          <div className="p-5 rounded-xl bg-slate-900/40 border border-slate-700/30">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shrink-0">
-                <Rss className="w-7 h-7 text-white" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shrink-0">
+                <Rss className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-white">RSS Feed</h3>
-                <p className="text-sm text-slate-400 truncate">{rssSubscribe}</p>
+                <h3 className="text-base font-bold text-white">RSS Feed</h3>
+                <p className="text-xs text-slate-400 truncate">{rssSubscribe}</p>
               </div>
               <motion.button
                 className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors shrink-0"
@@ -475,8 +452,8 @@ export default function SubscribePage() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigator.clipboard.writeText('https://ai-news-bice.vercel.app/api/rss')}
               >
-                <span className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4" />{copyText}
+                <span className="flex items-center gap-1.5">
+                  <ExternalLink className="w-3.5 h-3.5" />{copyText}
                 </span>
               </motion.button>
             </div>
@@ -488,10 +465,10 @@ export default function SubscribePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-20 text-center"
+          className="mt-16 text-center"
         >
           <p className="text-slate-500 text-sm">
-            © 2026 <span className="text-indigo-400">AI News Daily</span> · {locale === 'zh' ? '基于 Next.js 构建' : 'Built with Next.js'}
+            © 2026 <span className="text-indigo-400">AI News Daily</span>
           </p>
         </motion.div>
       </main>
