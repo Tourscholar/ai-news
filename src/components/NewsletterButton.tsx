@@ -92,34 +92,32 @@ export default function NewsletterButton() {
         </div>
       </motion.button>
 
-      {/* 弹窗：居中显示，玻璃拟态卡片，24px 大圆角 */}
+      {/* 弹窗：全屏居中显示 */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* 背景遮罩 */}
+          <>
+            {/* 遮罩层：fixed inset-0 bg-black/50 z-[100] */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/50 z-[100]"
               onClick={closeModal}
             />
             
-            {/* 弹窗卡片：玻璃拟态，24px 圆角 */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-              className="relative w-full max-w-md"
-            >
-              {/* 渐变边框 */}
-              <div className="absolute -inset-0.5 rounded-[26px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30 blur-sm" />
-              
-              {/* 玻璃拟态卡片 */}
-              <div className="relative rounded-[24px] overflow-hidden">
-                <div className="absolute inset-0 rounded-[24px] backdrop-blur-2xl bg-slate-900/70" />
+            {/* 弹窗容器：fixed inset-0 flex items-center justify-center z-[101] */}
+            <div className="fixed inset-0 flex items-center justify-center z-[101]">
+              {/* 弹窗卡片：relative bg-slate-900 rounded-2xl max-w-md w-full mx-4 */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="relative bg-slate-900 rounded-2xl max-w-md w-full mx-4 overflow-hidden"
+              >
+                {/* 渐变边框效果 */}
+                <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-30" />
                 
+                {/* 卡片内容 */}
                 <div className="relative p-6">
                   {/* 关闭按钮 */}
                   <button
@@ -130,14 +128,9 @@ export default function NewsletterButton() {
                   </button>
 
                   <div className="text-center mb-6">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-                      className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-xl border border-white/10 flex items-center justify-center"
-                    >
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-xl border border-white/10 flex items-center justify-center">
                       <Mail className="w-6 h-6 text-indigo-400" />
-                    </motion.div>
+                    </div>
                     <h3 className="text-lg font-bold text-white mb-1">
                       {locale === 'zh' ? '邮件简报' : 'Email Newsletter'}
                     </h3>
@@ -145,11 +138,7 @@ export default function NewsletterButton() {
                   </div>
 
                   {subscribeState === 'success' ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-center"
-                    >
+                    <div className="text-center">
                       <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-green-500/20 backdrop-blur-xl flex items-center justify-center border border-green-500/30">
                         <Check className="w-8 h-8 text-green-400" />
                       </div>
@@ -160,7 +149,7 @@ export default function NewsletterButton() {
                       >
                         {closeText}
                       </button>
-                    </motion.div>
+                    </div>
                   ) : (
                     <form onSubmit={handleSubscribe}>
                       <div className="flex gap-2">
@@ -207,9 +196,9 @@ export default function NewsletterButton() {
                     </motion.p>
                   )}
                 </div>
-              </div>
-            </motion.div>
-          </div>
+              </motion.div>
+            </div>
+          </>
         )}
       </AnimatePresence>
     </>
