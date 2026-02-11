@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
-import { Mail, Bell, Check, Rss, Zap, ExternalLink, Lock, Sparkles, ArrowRight } from 'lucide-react'
+import { Mail, Bell, Check, Zap, Lock, Sparkles, ArrowRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import { GlitchText } from '@/components/effects/CyberComponents'
@@ -126,8 +126,6 @@ export default function SubscribePage() {
     : 'Weekly curated AI news delivered to your inbox.'
     
   const enterEmail = locale === 'zh' ? '输入你的邮箱地址' : 'Enter your email'
-  const rssSubscribe = locale === 'zh' ? '使用 RSS 阅读器订阅' : 'Subscribe with RSS reader'
-  const copyText = locale === 'zh' ? '复制' : 'Copy'
   const popularBadge = locale === 'zh' ? '🔥 最受欢迎' : '🔥 Most Popular'
   const selectBtn = locale === 'zh' ? '选择计划' : 'Select Plan'
   const selectedText = locale === 'zh' ? '已选择' : 'Selected'
@@ -427,36 +425,6 @@ export default function SubscribePage() {
                   {subscribeMessage}
                 </motion.div>
               )}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* RSS Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="mt-12 max-w-xl mx-auto"
-        >
-          <div className="p-5 rounded-xl bg-slate-900/40 border border-slate-700/30">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shrink-0">
-                <Rss className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-white">RSS Feed</h3>
-                <p className="text-xs text-slate-400 truncate">{rssSubscribe}</p>
-              </div>
-              <motion.button
-                className="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors shrink-0"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigator.clipboard.writeText('https://ai-news-bice.vercel.app/api/rss')}
-              >
-                <span className="flex items-center gap-1.5">
-                  <ExternalLink className="w-3.5 h-3.5" />{copyText}
-                </span>
-              </motion.button>
             </div>
           </div>
         </motion.div>
