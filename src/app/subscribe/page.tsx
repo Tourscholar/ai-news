@@ -346,10 +346,6 @@ export default function SubscribePage() {
           ))}
         </div>
 
-            </div>
-          </div>
-        </motion.div>
-
         {/* Footer */}
         <motion.div
           initial={{ opacity: 0 }}
