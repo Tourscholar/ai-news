@@ -154,37 +154,31 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 md:py-8 mt-8 relative z-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Footer Left - Brand */}
-            <div className="flex items-center gap-2 md:gap-3">
-              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-indigo-400" />
-              <span className="text-sm md:text-base font-bold text-white">{t('footerTitle')}</span>
-            </div>
-            
-            {/* Footer Center - Newsletter */}
-            <div className="w-full md:w-auto max-w-sm md:max-w-md">
-              <NewsletterCard />
-            </div>
-            
-            {/* Footer Right - Links */}
-            <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                {t('dataSource')}
-              </span>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            {/* Footer Left - Logo + RSS */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-indigo-400" />
+                <span className="text-sm md:text-base font-bold text-white">{t('footerTitle')}</span>
+              </div>
               <a
                 href="/api/rss"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors"
+                className="flex items-center gap-1.5 text-orange-400 hover:text-orange-300 transition-colors text-xs md:text-sm"
               >
                 <Rss className="w-3.5 h-3.5" />
                 <span>RSS</span>
               </a>
             </div>
+            
+            {/* Footer Right - Newsletter */}
+            <div className="w-full md:w-auto max-w-sm md:max-w-md">
+              <NewsletterCard />
+            </div>
           </div>
           
-          <p className="text-center text-xs text-slate-600 mt-6">
+          <p className="text-left text-xs text-slate-600 mt-6">
             © 2026 {t('copyright')}
           </p>
         </div>
