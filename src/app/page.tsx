@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp, Rss } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
+import NewsletterCard from '@/components/NewsletterCard'
 import { GlitchText, CyberButton, NeonCard, DataCounter } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
 
@@ -121,7 +122,12 @@ export default function Home() {
           <NewsList />
         </Suspense>
       </main>
-      
+
+      {/* Newsletter Card */}
+      <section className="container mx-auto px-3 md:px-4 py-6 md:py-8 max-w-4xl relative z-10">
+        <NewsletterCard />
+      </section>
+
       {/* Back to Top Button */}
       <motion.button
         className="fixed bottom-8 right-8 z-40 group"
@@ -164,12 +170,8 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-slate-500">
               <span className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                {t('builtWith')}
+                {t('dataSource')}
               </span>
-              <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
-              <span>{t('deployedOn')}</span>
-              <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
-              <span>{t('dataSource')}</span>
               <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
               <a
                 href="/api/rss"
