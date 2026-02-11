@@ -123,11 +123,6 @@ export default function Home() {
         </Suspense>
       </main>
 
-      {/* Newsletter Card */}
-      <section className="container mx-auto px-3 md:px-4 py-6 md:py-8 max-w-4xl relative z-10">
-        <NewsletterCard />
-      </section>
-
       {/* Back to Top Button */}
       <motion.button
         className="fixed bottom-8 right-8 z-40 group"
@@ -157,34 +152,39 @@ export default function Home() {
       </motion.button>
       
       {/* Footer */}
-      <footer className="border-t border-slate-800 py-8 md:py-12 mt-12 relative z-10">
+      <footer className="border-t border-slate-800 py-6 md:py-8 mt-8 relative z-10">
         <div className="container mx-auto px-4">
-          <NeonCard glowColor="indigo" className="p-6 md:p-8 text-center">
-            <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
-              <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-indigo-400" />
-              <span className="text-lg md:text-xl font-bold text-white">{t('footerTitle')}</span>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Footer Left - Brand */}
+            <div className="flex items-center gap-2 md:gap-3">
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-indigo-400" />
+              <span className="text-sm md:text-base font-bold text-white">{t('footerTitle')}</span>
             </div>
-            <p className="text-slate-400 mb-4 md:mb-6 max-w-md mx-auto text-sm md:text-base">
-              {t('footerDesc')}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-slate-500">
+            
+            {/* Footer Center - Newsletter */}
+            <div className="w-full md:w-auto max-w-sm md:max-w-md">
+              <NewsletterCard />
+            </div>
+            
+            {/* Footer Right - Links */}
+            <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-slate-500">
               <span className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 {t('dataSource')}
               </span>
-              <span className="hidden sm:inline w-1 h-1 rounded-full bg-slate-600" />
               <a
                 href="/api/rss"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-orange-400 hover:text-orange-300 transition-colors"
+                className="flex items-center gap-1 text-orange-400 hover:text-orange-300 transition-colors"
               >
                 <Rss className="w-3.5 h-3.5" />
                 <span>RSS</span>
               </a>
             </div>
-          </NeonCard>
-          <p className="text-center text-xs text-slate-600 mt-6 px-4">
+          </div>
+          
+          <p className="text-center text-xs text-slate-600 mt-6">
             © 2026 {t('copyright')}
           </p>
         </div>
