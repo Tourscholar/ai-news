@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Mail, Bell, Check, Zap, Lock, Sparkles, ArrowRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
+import NewsletterButton from '@/components/NewsletterButton'
 import { GlitchText } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
 
@@ -136,6 +137,12 @@ export default function SubscribePage() {
 
   const handlePlanSelect = (plan: Plan) => {
     if (plan.paid && !session) return
+    // 免费版：触发邮件订阅弹窗
+    if (plan.id === 'free') {
+      // 这里使用全局事件触发 NewsletterButton 弹窗
+      window.dispatchEvent(new CustomEvent('openNewsletter'))
+      return
+    }
     setSelectedPlan(plan.id)
   }
 

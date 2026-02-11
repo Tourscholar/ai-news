@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Sparkles, Cpu, Zap, TrendingUp, ArrowUp, Rss } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
-import NewsletterCard from '@/components/NewsletterCard'
+import NewsletterButton from '@/components/NewsletterButton'
 import { GlitchText, CyberButton, NeonCard, DataCounter } from '@/components/effects/CyberComponents'
 import { useLanguage } from '@/locales/LanguageContext'
 
@@ -154,9 +154,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 md:py-8 mt-8 relative z-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            {/* Footer Left - Logo + RSS */}
-            <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center gap-6">
+            {/* Footer Logo + RSS */}
+            <div className="flex flex-col items-center gap-3">
               <div className="flex items-center gap-2 md:gap-3">
                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-indigo-400" />
                 <span className="text-sm md:text-base font-bold text-white">{t('footerTitle')}</span>
@@ -172,13 +172,13 @@ export default function Home() {
               </a>
             </div>
             
-            {/* Footer Right - Newsletter */}
+            {/* Newsletter Button */}
             <div className="w-full md:w-auto max-w-sm md:max-w-md">
-              <NewsletterCard />
+              <NewsletterButton />
             </div>
           </div>
           
-          <p className="text-left text-xs text-slate-600 mt-6">
+          <p className="text-center text-xs text-slate-600 mt-6">
             © 2026 {t('copyright')}
           </p>
         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, X, Bell, Check, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/locales/LanguageContext'
@@ -11,6 +11,17 @@ export default function NewsletterButton() {
   const [email, setEmail] = useState('')
   const [subscribeState, setSubscribeState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [subscribeMessage, setSubscribeMessage] = useState('')
+
+  // 监听全局事件触发弹窗
+  useEffect(() => {
+    const handleOpenNewsletter = () => {
+      setIsOpen(true)
+    }
+    window.addEventListener('openNewsletter', handleOpenNewsletter)
+    return () => {
+      window.removeEventListener('openNewsletter', handleOpenNewsletter)
+    }
+  }, [])
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
