@@ -9,6 +9,7 @@ import { GlitchText } from '@/components/effects/CyberComponents'
 import AuthButton from '@/components/auth/AuthButton'
 import LanguageSwitcher from '@/locales/LanguageSwitcher'
 import { useLanguage } from '@/locales/LanguageContext'
+import NewsletterButton from '@/components/NewsletterButton'
 
 export default function Header() {
   const { t } = useLanguage()
@@ -112,6 +113,7 @@ export default function Header() {
           {/* Actions - Language + Auth + Subscribe */}
           <div className="flex items-center gap-2 md:gap-3">
             <LanguageSwitcher />
+            <NewsletterButton />
             <AuthButton />
             
             <motion.a
