@@ -9,6 +9,8 @@ interface NewsItem {
   url: string
 }
 
+type PublishedNewsItem = NewsItem & { publishedAt: number | null }
+
 function categorizeNews(title: string): string {
   const lowerTitle = title.toLowerCase()
   
@@ -46,9 +48,9 @@ function categorizeNews(title: string): string {
   return 'other'
 }
 
-function formatTimestamp(dateStr: string): string {
+function formatTimestamp(publishedAt: number): string {
   try {
-    const pubDate = new Date(dateStr)
+    const pubDate = new Date(publishedAt)
     const now = new Date()
     const diffHours = Math.floor((now.getTime() - pubDate.getTime()) / (1000 * 60 * 60))
     
@@ -68,7 +70,7 @@ function formatTimestamp(dateStr: string): string {
   }
 }
 
-async function fetchRSS(url: string, source: string, timeout = 10000): Promise<NewsItem[]> {
+async function fetchRSS(url: string, source: string, timeout = 10000): Promise<PublishedNewsItem[]> {
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), timeout)
@@ -87,7 +89,7 @@ async function fetchRSS(url: string, source: string, timeout = 10000): Promise<N
     if (!res.ok) return []
     
     const xmlText = await res.text()
-    const news: NewsItem[] = []
+    const news: PublishedNewsItem[] = []
     const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g
     let match
     let itemCount = 0
@@ -112,7 +114,9 @@ async function fetchRSS(url: string, source: string, timeout = 10000): Promise<N
       
       // Extract pubDate
       const pubDateMatch = itemContent.match(/<pubDate>(.*?)<\/pubDate>/)
-      const timestamp = pubDateMatch ? formatTimestamp(pubDateMatch[1]) : 'Recently'
+      const parsedDate = pubDateMatch ? Date.parse(pubDateMatch[1]) : NaN
+      const publishedAt = Number.isFinite(parsedDate) ? parsedDate : null
+      const timestamp = publishedAt === null ? 'Recently' : formatTimestamp(publishedAt)
       
       news.push({
         id: `${source.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${itemCount}-${Date.now()}`,
@@ -120,6 +124,7 @@ async function fetchRSS(url: string, source: string, timeout = 10000): Promise<N
         source,
         category: categorizeNews(title),
         timestamp,
+        publishedAt,
         url: link
       })
       
@@ -133,7 +138,7 @@ async function fetchRSS(url: string, source: string, timeout = 10000): Promise<N
   }
 }
 
-async function fetchAI_news(): Promise<NewsItem[]> {
+async function fetchAI_news(): Promise<PublishedNewsItem[]> {
   // Main AI news sources
   const sources = [
     { url: 'https://news.mit.edu/rss/topic/artificial-intelligence2', source: 'MIT News' },
@@ -146,7 +151,7 @@ async function fetchAI_news(): Promise<NewsItem[]> {
       sources.map(s => fetchRSS(s.url, s.source))
     )
     
-    const allNews: NewsItem[] = []
+    const allNews: PublishedNewsItem[] = []
     results.forEach((result) => {
       if (result.status === 'fulfilled') {
         allNews.push(...result.value)
@@ -159,7 +164,7 @@ async function fetchAI_news(): Promise<NewsItem[]> {
   }
 }
 
-async function fetchAuthoritativeNews(): Promise<NewsItem[]> {
+async function fetchAuthoritativeNews(): Promise<PublishedNewsItem[]> {
   // Tech news sources
   const sources = [
     { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch' },
@@ -174,7 +179,7 @@ async function fetchAuthoritativeNews(): Promise<NewsItem[]> {
       sources.map(s => fetchRSS(s.url, s.source, 8000))
     )
     
-    const allNews: NewsItem[] = []
+    const allNews: PublishedNewsItem[] = []
     results.forEach((result, index) => {
       if (result.status === 'fulfilled' && result.value.length > 0) {
         allNews.push(...result.value)
@@ -209,18 +214,16 @@ export async function GET() {
       return true
     })
     
-    // Sort by recency (newer first)
+    // Sort by the source publication date, not the rounded display label.
     uniqueNews.sort((a, b) => {
-      const timeA = a.timestamp.replace(/[hd]/g, '').replace('Just now', '0').replace('Yesterday', '24')
-      const timeB = b.timestamp.replace(/[hd]/g, '').replace('Just now', '0').replace('Yesterday', '24')
-      const numA = parseInt(timeA) || 999
-      const numB = parseInt(timeB) || 999
-      return numA - numB
+      if (a.publishedAt === null) return b.publishedAt === null ? 0 : 1
+      if (b.publishedAt === null) return -1
+      return b.publishedAt - a.publishedAt
     })
-    
-    // Return top 20 unique news items
-    const finalNews = uniqueNews.slice(0, 20)
-    
+
+    // Keep the existing public response shape.
+    const finalNews = uniqueNews.slice(0, 20).map(({ publishedAt, ...item }) => item)
+
     // If no real news, return sample data
     if (finalNews.length === 0) {
       return NextResponse.json(getSampleNews())
