@@ -57,7 +57,7 @@ cp .env.example .env.local
 
 ## 技术栈
 
-- **框架**: Next.js 14 (App Router)
+- **框架**: Next.js 16 (App Router)
 - **认证**: NextAuth.js (GitHub)
 - **样式**: Tailwind CSS + Framer Motion
 - **部署**: Vercel + GitHub Actions

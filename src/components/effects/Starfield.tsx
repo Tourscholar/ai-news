@@ -15,7 +15,7 @@ interface Star {
 export default function Starfield() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [stars, setStars] = useState<Star[]>([])
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current
